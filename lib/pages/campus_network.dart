@@ -24,16 +24,16 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
   @override
   void initState() {
     super.initState();
-    readData("username").then((data) => setState(() {
+    readData("campus_network_username").then((data) => setState(() {
           _usernameTextEditingController.text = data!;
         }));
-    readData("password").then((data) => setState(() {
+    readData("campus_network_password").then((data) => setState(() {
           _passwordTextEditingController.text = data!;
         }));
-    readData("isSavePassword").then((data) => setState(() {
+    readData("campus_network_enableSavePassword").then((data) => setState(() {
           _savePasswordSelected = bool.tryParse(data!)!;
         }));
-    readData("operator").then((data) => setState(() {
+    readData("campus_network_operator").then((data) => setState(() {
           _operatorSelected = int.tryParse(data!)!;
         }));
   }
@@ -44,7 +44,7 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
       const Image(
         image: AssetImage("images/icon_ecjtu_256.png"),
-        width: 150,
+        width: 125,
       ),
       Container(
         margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
@@ -151,16 +151,16 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
 
   _onLoginSuccess() {
     if (_savePasswordSelected) {
-      saveData("username", _usernameTextEditingController.text);
-      saveData("password", _passwordTextEditingController.text);
-      saveData("operator", _operatorSelected.toString());
+      saveData("campus_network_username", _usernameTextEditingController.text);
+      saveData("campus_network_password", _passwordTextEditingController.text);
+      saveData("campus_network_operator", _operatorSelected.toString());
     }
     else {
-      saveData("username", "");
-      saveData("password", "");
-      saveData("operator", "");
+      saveData("campus_network_username", "");
+      saveData("campus_network_password", "");
+      saveData("campus_network_operator", "");
     }
-    saveData("isSavePassword", _savePasswordSelected.toString());
+    saveData("campus_network_enableSavePassword", _savePasswordSelected.toString());
     Fluttertoast.cancel();
     Fluttertoast.showToast(msg: "登陆成功！", gravity: ToastGravity.TOP, backgroundColor: Colors.green, fontSize: 18);
   }

@@ -1,5 +1,6 @@
 import 'package:ecjtu_helper/pages/about.dart';
 import 'package:ecjtu_helper/pages/campus_network.dart';
+import 'package:ecjtu_helper/pages/library_webview.dart';
 import 'package:flutter/material.dart';
 
 class MainNavBarPage extends StatefulWidget {
@@ -12,7 +13,7 @@ class MainNavBarPage extends StatefulWidget {
 }
 
 class _MainNavBarPageState extends State<MainNavBarPage> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +41,11 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
   Widget getPage(int index) {
     switch (index) {
       case 0:
-        return CampusNetworkPage();
+        return const LibraryWebviewPage();
       case 1:
-        return AboutPage();
+        return const CampusNetworkPage();
+      case 2:
+        return const AboutPage();
       default:
         throw Exception();
     }
@@ -50,6 +53,12 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
 }
 
 const List<NavigationDestination> navigationList = [
+  NavigationDestination(
+    tooltip: "",
+    icon: Icon(Icons.collections_bookmark_outlined),
+    label: "图书馆",
+    selectedIcon: Icon(Icons.collections_bookmark),
+  ),
   NavigationDestination(
     tooltip: "",
     icon: Icon(Icons.wifi),
