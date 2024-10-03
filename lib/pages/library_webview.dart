@@ -46,56 +46,41 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
           flex: 1,
           child: Row(
             children: [
-              Container(width: 10),
-              // Container(
-              //   margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-              Expanded(
-                flex: 4,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.keyboard_backspace),
-                  label: const Text("上一页"),
-                  onPressed: () {
-                    webViewController.canGoBack().then((bool canGoBack) {
-                      if (canGoBack) {
-                        webViewController.goBack();
-                      } else {
-                        Fluttertoast.showToast(
-                            msg: "已经是第一页", gravity: ToastGravity.BOTTOM);
-                      }
-                    });
-                  },
-                ),
+              Expanded(flex: 1, child: Container(),),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.keyboard_backspace),
+                label: const Text("上一页"),
+                onPressed: () {
+                  webViewController.canGoBack().then((bool canGoBack) {
+                    if (canGoBack) {
+                      webViewController.goBack();
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: "已经是第一页", gravity: ToastGravity.BOTTOM);
+                    }
+                  });
+                },
               ),
-              Container(width: 20),
-              // Container(
-              //   margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-              Expanded(
-                flex: 5,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.settings),
-                  label: const Text("自动登录设置"),
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (BuildContext context) {
-                        return const AutoLoginSettingsRoute();
-                      }),
-                    );
-                  },
-                ),
+              Expanded(flex: 1, child: Container(),),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.settings),
+                label: const Text("自动登录设置"),
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return const AutoLoginSettingsRoute();
+                    }),
+                  );
+                },
               ),
-              Container(width: 20),
-              // Container(
-              //   margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-              Expanded(
-                flex: 4,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.access_time),
-                  label: Text("${_currentTime.hour}:${_currentTime.minute.toString().padLeft(2,'0')}:${_currentTime.second.toString().padLeft(2,'0')}"),
-                  onPressed: () {},
-                ),
+              Expanded(flex: 1, child: Container(),),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.access_time),
+                label: Text("${_currentTime.hour}:${_currentTime.minute.toString().padLeft(2,'0')}:${_currentTime.second.toString().padLeft(2,'0')}"),
+                onPressed: () {},
               ),
-              Container(width: 10)
+              Expanded(flex: 1, child: Container(),),
             ],
           ),
         ),
