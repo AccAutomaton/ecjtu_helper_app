@@ -84,6 +84,7 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
             ],
           ),
         ),
+        Container(margin: const EdgeInsets.fromLTRB(0, 0, 0, 20)),
         Expanded(
           flex: 20,
           child: WebViewWidget(controller: webViewController),
@@ -182,7 +183,7 @@ class _AutoLoginSettingsRouteState extends State<AutoLoginSettingsRoute> {
                         style: TextStyle(fontSize: 16, color: Colors.blue))
                   ] else ...[
                     const Text("自动登录服务已关闭",
-                        style: TextStyle(fontSize: 16, color: Colors.black87))
+                        style: TextStyle(fontSize: 16))
                   ],
                   Container(
                     margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
