@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -14,6 +16,27 @@ class LibraryWebviewPage extends StatefulWidget {
 }
 
 class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
+  late Timer _timer;
+  late DateTime _currentTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), setCurrentTime);
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void setCurrentTime(Timer timer) {
+    setState(() {
+      _currentTime = DateTime.now();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -23,8 +46,11 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
           flex: 1,
           child: Row(
             children: [
-              Container(
-                margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              Container(width: 10),
+              // Container(
+              //   margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              Expanded(
+                flex: 4,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.keyboard_backspace),
                   label: const Text("上一页"),
@@ -40,8 +66,11 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                   },
                 ),
               ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(175, 0, 0, 0),
+              Container(width: 20),
+              // Container(
+              //   margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              Expanded(
+                flex: 5,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.settings),
                   label: const Text("自动登录设置"),
@@ -54,7 +83,19 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                     );
                   },
                 ),
-              )
+              ),
+              Container(width: 20),
+              // Container(
+              //   margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+              Expanded(
+                flex: 4,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.access_time),
+                  label: Text("${_currentTime.hour}:${_currentTime.minute.toString().padLeft(2,'0')}:${_currentTime.second.toString().padLeft(2,'0')}"),
+                  onPressed: () {},
+                ),
+              ),
+              Container(width: 10)
             ],
           ),
         ),
@@ -74,7 +115,8 @@ final WebViewController webViewController = WebViewController()
   ..setNavigationDelegate(NavigationDelegate(
     onPageFinished: (String url) async {
       bool enableAutoLogin = false;
-      await readData("library_enableAutoLogin").then((data) => enableAutoLogin = bool.tryParse(data!)!);
+      await readData("library_enableAutoLogin")
+          .then((data) => enableAutoLogin = bool.tryParse(data!)!);
       if (enableAutoLogin) {
         String username = "", password = "";
         await readData("library_username").then((data) => username = data!);
@@ -116,23 +158,23 @@ class AutoLoginSettingsRoute extends StatefulWidget {
 
 class _AutoLoginSettingsRouteState extends State<AutoLoginSettingsRoute> {
   final TextEditingController _usernameTextEditingController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController _passwordTextEditingController =
-  TextEditingController();
+      TextEditingController();
   bool _enableAutoLogin = false;
 
   @override
   void initState() {
     super.initState();
     readData("library_username").then((data) => setState(() {
-      _usernameTextEditingController.text = data!;
-    }));
+          _usernameTextEditingController.text = data!;
+        }));
     readData("library_password").then((data) => setState(() {
-      _passwordTextEditingController.text = data!;
-    }));
+          _passwordTextEditingController.text = data!;
+        }));
     readData("library_enableAutoLogin").then((data) => setState(() {
-      _enableAutoLogin = bool.tryParse(data!)!;
-    }));
+          _enableAutoLogin = bool.tryParse(data!)!;
+        }));
   }
 
   @override
@@ -151,9 +193,11 @@ class _AutoLoginSettingsRouteState extends State<AutoLoginSettingsRoute> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (_enableAutoLogin) ...[
-                    const Text("自动登录服务已开启", style: TextStyle(fontSize: 16, color: Colors.blue))
+                    const Text("自动登录服务已开启",
+                        style: TextStyle(fontSize: 16, color: Colors.blue))
                   ] else ...[
-                    const Text("自动登录服务已关闭", style: TextStyle(fontSize: 16, color: Colors.black87))
+                    const Text("自动登录服务已关闭",
+                        style: TextStyle(fontSize: 16, color: Colors.black87))
                   ],
                   Container(
                     margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
@@ -163,7 +207,8 @@ class _AutoLoginSettingsRouteState extends State<AutoLoginSettingsRoute> {
                         onChanged: (newValue) {
                           setState(() {
                             _enableAutoLogin = newValue;
-                            saveData("library_enableAutoLogin", newValue.toString());
+                            saveData(
+                                "library_enableAutoLogin", newValue.toString());
                           });
                         }),
                   ),
@@ -193,18 +238,26 @@ class _AutoLoginSettingsRouteState extends State<AutoLoginSettingsRoute> {
               ),
             ),
             Container(
-              margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: const Text("凭据将保存在本地", style: TextStyle(color: Colors.grey),)
-            ),
+                margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                child: const Text(
+                  "凭据将保存在本地",
+                  style: TextStyle(color: Colors.grey),
+                )),
             Container(
               margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.save),
                 label: const Text("保存凭据"),
                 onPressed: () {
-                  saveData("library_username", _usernameTextEditingController.text);
-                  saveData("library_password", _passwordTextEditingController.text);
-                  Fluttertoast.showToast(msg: "保存成功！", gravity: ToastGravity.TOP, backgroundColor: Colors.green, fontSize: 18);
+                  saveData(
+                      "library_username", _usernameTextEditingController.text);
+                  saveData(
+                      "library_password", _passwordTextEditingController.text);
+                  Fluttertoast.showToast(
+                      msg: "保存成功！",
+                      gravity: ToastGravity.TOP,
+                      backgroundColor: Colors.green,
+                      fontSize: 18);
                 },
                 style: const ButtonStyle(
                     minimumSize: WidgetStatePropertyAll(Size(160, 60))),
