@@ -40,32 +40,76 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
     });
   }
 
+  Widget _appBarLeadingMenuAnchorBuilder(
+      _, MenuController controller, Widget? child) {
+    return GestureDetector(
+      onTap: controller.open,
+      child: IconButton(
+          icon: const Icon(Icons.more_vert),
+          onPressed: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: const Text("华东交通大学图书馆IC空间"),
           centerTitle: true,
+          leading: MenuAnchor(
+            builder: _appBarLeadingMenuAnchorBuilder,
+            menuChildren: [
+              ElevatedButton.icon(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  minimumSize: const WidgetStatePropertyAll(Size(175, 50)),
+                ),
+                icon: const Icon(Icons.refresh),
+                label: const Text("刷新"),
+                onPressed: () {
+                  webViewController.reload();
+                },
+              ),
+              ElevatedButton.icon(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  minimumSize: const WidgetStatePropertyAll(Size(175, 50)),
+                ),
+                icon: const Icon(Icons.delete_forever_outlined),
+                label: const Text("清除缓存并刷新"),
+                onPressed: () {
+                  webViewController.clearCache();
+                  webViewController.clearLocalStorage();
+                  webViewController.reload();
+                },
+              ),
+            ],
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.qr_code_scanner),
               onPressed: () {
-                webViewController.currentUrl().then((url) async  {
-                      if (url!.contains("lib2.ecjtu.edu.cn"))
-                        {
-                          _scanResult = await FlutterHmsScanKit.startScan();
-                          String? to = "http://lib2.ecjtu.edu.cn/";
-                          to = _scanResult?.value;
-                          webViewController.loadRequest(Uri.parse(to!));
-                        }
-                      else
-                        {
-                          Fluttertoast.showToast(
-                              msg: "请先登录图书馆再扫码",
-                              gravity: ToastGravity.CENTER,
-                              backgroundColor: Colors.yellow);
-                        }
-                    });
+                webViewController.currentUrl().then((url) async {
+                  if (url!.contains("lib2.ecjtu.edu.cn")) {
+                    _scanResult = await FlutterHmsScanKit.startScan();
+                    String? to = "http://lib2.ecjtu.edu.cn/";
+                    to = _scanResult?.value;
+                    webViewController.loadRequest(Uri.parse(to!));
+                  } else {
+                    Fluttertoast.showToast(
+                        msg: "请先登录图书馆再扫码",
+                        gravity: ToastGravity.CENTER,
+                        backgroundColor: Colors.yellow);
+                  }
+                });
               },
             ),
           ],
