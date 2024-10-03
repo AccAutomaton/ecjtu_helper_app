@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hms_scan_kit/flutter_hms_scan_kit.dart';
+import 'package:flutter_hms_scan_kit/scan_result.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -16,6 +18,7 @@ class LibraryWebviewPage extends StatefulWidget {
 }
 
 class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
+  ScanResult? _scanResult;
   late Timer _timer;
   late DateTime _currentTime;
 
@@ -39,58 +42,99 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 1,
-          child: Row(
-            children: [
-              Expanded(flex: 1, child: Container(),),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.keyboard_backspace),
-                label: const Text("上一页"),
-                onPressed: () {
-                  webViewController.canGoBack().then((bool canGoBack) {
-                    if (canGoBack) {
-                      webViewController.goBack();
-                    } else {
-                      Fluttertoast.showToast(
-                          msg: "已经是第一页", gravity: ToastGravity.BOTTOM);
-                    }
-                  });
-                },
-              ),
-              Expanded(flex: 1, child: Container(),),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.settings),
-                label: const Text("自动登录设置"),
-                onPressed: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (BuildContext context) {
-                      return const AutoLoginSettingsRoute();
-                    }),
-                  );
-                },
-              ),
-              Expanded(flex: 1, child: Container(),),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.access_time),
-                label: Text("${_currentTime.hour}:${_currentTime.minute.toString().padLeft(2,'0')}:${_currentTime.second.toString().padLeft(2,'0')}"),
-                onPressed: () {},
-              ),
-              Expanded(flex: 1, child: Container(),),
-            ],
-          ),
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("华东交通大学图书馆IC空间"),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.qr_code_scanner),
+              onPressed: () {
+                webViewController.currentUrl().then((url) async  {
+                      if (url!.contains("lib2.ecjtu.edu.cn"))
+                        {
+                          _scanResult = await FlutterHmsScanKit.startScan();
+                          String? to = "http://lib2.ecjtu.edu.cn/";
+                          to = _scanResult?.value;
+                          webViewController.loadRequest(Uri.parse(to!));
+                        }
+                      else
+                        {
+                          Fluttertoast.showToast(
+                              msg: "请先登录图书馆再扫码",
+                              gravity: ToastGravity.CENTER,
+                              backgroundColor: Colors.yellow);
+                        }
+                    });
+              },
+            ),
+          ],
         ),
-        Container(margin: const EdgeInsets.fromLTRB(0, 0, 0, 20)),
-        Expanded(
-          flex: 20,
-          child: WebViewWidget(controller: webViewController),
-        ),
-      ],
-    );
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 1,
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Container(),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.keyboard_backspace),
+                    label: const Text("上一页"),
+                    onPressed: () {
+                      webViewController.canGoBack().then((bool canGoBack) {
+                        if (canGoBack) {
+                          webViewController.goBack();
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "已经是第一页", gravity: ToastGravity.BOTTOM);
+                        }
+                      });
+                    },
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.settings),
+                    label: const Text("自动登录设置"),
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (BuildContext context) {
+                          return const AutoLoginSettingsRoute();
+                        }),
+                      );
+                    },
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.access_time),
+                    label: Text(
+                        "${_currentTime.hour}:${_currentTime.minute.toString().padLeft(2, '0')}:${_currentTime.second.toString().padLeft(2, '0')}"),
+                    onPressed: () {},
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(),
+                  ),
+                ],
+              ),
+            ),
+            Container(margin: const EdgeInsets.fromLTRB(0, 0, 0, 20)),
+            Expanded(
+              flex: 20,
+              child: WebViewWidget(controller: webViewController),
+            ),
+          ],
+        ));
   }
 }
 
@@ -126,7 +170,7 @@ final WebViewController webViewController = WebViewController()
     },
     onWebResourceError: (WebResourceError error) {
       Fluttertoast.showToast(
-          msg: "Error: 加载网页超时或错误",
+          msg: "Error: 加载网页时出现错误",
           gravity: ToastGravity.CENTER,
           backgroundColor: Colors.red);
     },
@@ -182,8 +226,7 @@ class _AutoLoginSettingsRouteState extends State<AutoLoginSettingsRoute> {
                     const Text("自动登录服务已开启",
                         style: TextStyle(fontSize: 16, color: Colors.blue))
                   ] else ...[
-                    const Text("自动登录服务已关闭",
-                        style: TextStyle(fontSize: 16))
+                    const Text("自动登录服务已关闭", style: TextStyle(fontSize: 16))
                   ],
                   Container(
                     margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),

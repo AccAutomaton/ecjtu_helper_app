@@ -21,10 +21,14 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
         home: Scaffold(
-          appBar: AppBar(
-            title: const Text("ECJTU Helper", textDirection: TextDirection.ltr),
+          body: IndexedStack(
+            index: _currentIndex,
+            children: const [
+              LibraryWebviewPage(),
+              CampusNetworkPage(),
+              AboutPage(),
+            ],
           ),
-          body: getPage(_currentIndex),
           bottomNavigationBar: NavigationBar(
             destinations: navigationList,
             selectedIndex: _currentIndex,
@@ -36,19 +40,6 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
           ),
         )
     );
-  }
-
-  Widget getPage(int index) {
-    switch (index) {
-      case 0:
-        return const LibraryWebviewPage();
-      case 1:
-        return const CampusNetworkPage();
-      case 2:
-        return const AboutPage();
-      default:
-        throw Exception();
-    }
   }
 }
 
