@@ -74,7 +74,7 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                 icon: const Icon(Icons.refresh),
                 label: const Text("刷新"),
                 onPressed: () {
-                  webViewController.reload();
+                  libraryWebViewController.reload();
                 },
               ),
               ElevatedButton.icon(
@@ -86,9 +86,9 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                 icon: const Icon(Icons.delete_forever_outlined),
                 label: const Text("清除缓存并刷新"),
                 onPressed: () {
-                  webViewController.clearCache();
-                  webViewController.clearLocalStorage();
-                  webViewController.reload();
+                  libraryWebViewController.clearCache();
+                  libraryWebViewController.clearLocalStorage();
+                  libraryWebViewController.reload();
                 },
               ),
             ],
@@ -97,12 +97,12 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
             IconButton(
               icon: const Icon(Icons.qr_code_scanner),
               onPressed: () {
-                webViewController.currentUrl().then((url) async {
+                libraryWebViewController.currentUrl().then((url) async {
                   if (url!.contains("lib2.ecjtu.edu.cn")) {
                     _scanResult = await FlutterHmsScanKit.startScan();
                     String? to = "http://lib2.ecjtu.edu.cn/";
                     to = _scanResult?.value;
-                    webViewController.loadRequest(Uri.parse(to!));
+                    libraryWebViewController.loadRequest(Uri.parse(to!));
                   } else {
                     Fluttertoast.showToast(
                         msg: "请先登录图书馆再扫码",
@@ -129,9 +129,9 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                     icon: const Icon(Icons.keyboard_backspace),
                     label: const Text("上一页"),
                     onPressed: () {
-                      webViewController.canGoBack().then((bool canGoBack) {
+                      libraryWebViewController.canGoBack().then((bool canGoBack) {
                         if (canGoBack) {
-                          webViewController.goBack();
+                          libraryWebViewController.goBack();
                         } else {
                           Fluttertoast.showToast(
                               msg: "已经是第一页", gravity: ToastGravity.BOTTOM);
@@ -175,14 +175,14 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
             Container(margin: const EdgeInsets.fromLTRB(0, 0, 0, 20)),
             Expanded(
               flex: 20,
-              child: WebViewWidget(controller: webViewController),
+              child: WebViewWidget(controller: libraryWebViewController),
             ),
           ],
         ));
   }
 }
 
-final WebViewController webViewController = WebViewController()
+final WebViewController libraryWebViewController = WebViewController()
   ..setJavaScriptMode(JavaScriptMode.unrestricted)
   ..setUserAgent(
       "Mozilla/5.0 (Linux; Android 6.0.1; MX4 Build/MOB30M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.106 Mobile Safari/537.36")
@@ -196,19 +196,19 @@ final WebViewController webViewController = WebViewController()
         await readData("library_username").then((data) => username = data!);
         await readData("library_password").then((data) => password = data!);
         if (url.contains("rz.ecjtu.edu.cn")) {
-          webViewController.runJavaScript(
+          libraryWebViewController.runJavaScript(
               'document.getElementsByName("username")[0].value = "$username"');
-          webViewController.runJavaScript(
+          libraryWebViewController.runJavaScript(
               'document.getElementsByName("password")[0].value = "$password"');
-          webViewController.runJavaScript(
+          libraryWebViewController.runJavaScript(
               'document.getElementsByTagName("button")[0].click()');
         }
         if (url.contains("cas.ecjtu.edu.cn")) {
-          webViewController.runJavaScript(
+          libraryWebViewController.runJavaScript(
               'document.getElementById("username").value = "$username"');
-          webViewController.runJavaScript(
+          libraryWebViewController.runJavaScript(
               'document.getElementById("password").value = "$password"');
-          webViewController.runJavaScript('submitInfo()');
+          libraryWebViewController.runJavaScript('submitInfo()');
         }
       }
     },
