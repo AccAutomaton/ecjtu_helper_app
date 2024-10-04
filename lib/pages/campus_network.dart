@@ -138,16 +138,15 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
       Fluttertoast.showToast(msg: "请选择运营商", gravity: ToastGravity.CENTER, backgroundColor: Colors.red);
       return;
     }
-    Fluttertoast.showToast(msg: "该功能正在测试中", gravity: ToastGravity.CENTER, backgroundColor: Colors.brown, fontSize: 18);
-    // Fluttertoast.showToast(msg: "登陆中", gravity: ToastGravity.TOP, backgroundColor: Colors.blue, fontSize: 18);
-    // try {
-    //   await logout();
-    //   await login(_usernameTextEditingController.text, _passwordTextEditingController.text, _operatorSelected);
-    //   _onLoginSuccess();
-    // }
-    // on DioException catch (e) {
-    //   Fluttertoast.showToast(msg: "错误：$e", gravity: ToastGravity.CENTER, backgroundColor: Colors.red);
-    // }
+    Fluttertoast.showToast(msg: "登陆中", gravity: ToastGravity.TOP, backgroundColor: Colors.blue, fontSize: 18);
+    try {
+      await logout();
+      await login(_usernameTextEditingController.text, _passwordTextEditingController.text, _operatorSelected);
+      _onLoginSuccess();
+    }
+    on DioException catch (e) {
+      Fluttertoast.showToast(msg: "错误：$e", gravity: ToastGravity.CENTER, backgroundColor: Colors.red);
+    }
   }
 
   _onLoginSuccess() {

@@ -214,9 +214,8 @@ final WebViewController libraryWebViewController = WebViewController()
     },
     onWebResourceError: (WebResourceError error) {
       Fluttertoast.showToast(
-          msg: "Error: 加载网页时出现错误",
-          gravity: ToastGravity.CENTER,
-          backgroundColor: Colors.red);
+          msg: "网页开小差了...",
+          gravity: ToastGravity.BOTTOM);
     },
   ))
   ..loadRequest(Uri.parse("http://lib2.ecjtu.edu.cn/"));
