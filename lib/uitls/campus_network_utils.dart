@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
 
-Dio dio = Dio(
-  BaseOptions(
-    connectTimeout: const Duration(seconds: 5),
-    receiveTimeout: const Duration(seconds: 5),
-  )
-);
+Dio dio = Dio(BaseOptions(
+  connectTimeout: const Duration(seconds: 5),
+  receiveTimeout: const Duration(seconds: 5),
+  followRedirects: true,
+  validateStatus: (status) => status! < 500,
+));
 
 logout() async {
   try {
-    await dio.get(
+    await dio.request(
         "http://172.16.2.100:801/eportal/?c=ACSetting&a=Logout&wlanuserip=null&wlanacip=null&wlanacname=null&port=&hostname=172.16.2.100&iTermType=1&session=null&queryACIP=0&mac=00-00-00-00-00-00");
   } on DioException {
     rethrow;
@@ -18,15 +18,16 @@ logout() async {
 
 login(String? username, String? password, int? operator) async {
   try {
-    String loginPage = (await dio.get("http://172.16.2.100/")).data.toString();
+    String loginPage =
+        (await dio.request("http://172.16.2.100/")).data.toString();
     int v64ipLocation = loginPage.indexOf("v46ip");
-    String restLoginPage = loginPage.substring(v64ipLocation + 6);
+    String restLoginPage = loginPage.substring(v64ipLocation + 7);
     int ipEnd = restLoginPage.indexOf("'");
     String ip = restLoginPage.substring(0, ipEnd);
 
     String operatorName = getOperatorName(operator!);
-    await dio.post(
-        "http://172.16.2.100:801/eportal/?c=ACSetting&a=Login&protocol=http:&hostname=172.16.2.100&iTermType=1&wlanuserip=$ip&wlanacip=null&wlanacname=null&mac=00-00-00-00-00-00&ip=$ip&enAdvert=0&queryACIP=0&loginMethod=1",
+    await dio.request(
+        "http://172.16.2.100:801/eportal/?c=ACSetting&a=Login&protocol=http:&hostname=172.16.2.100&iTermType=2&wlanuserip=$ip&wlanacip=null&wlanacname=null&mac=00-00-00-00-00-00&ip=$ip&enAdvert=0&queryACIP=0&loginMethod=1",
         data: {
           "DDDDD": ",1,$username@$operatorName",
           "upass": "$password",
@@ -44,7 +45,14 @@ login(String? username, String? password, int? operator) async {
           "user": "",
           "cmd": "",
           "Login": "",
-        });
+        },
+        options: Options(
+          method: "post",
+          contentType: Headers.formUrlEncodedContentType,
+        ));
+    if ((await dio.request("http://172.16.2.100/")).data.toString().contains("--Dr.COMWebLoginID_0.htm-->")) {
+      throw DioException(requestOptions: RequestOptions(), message: "请检查用户名或密码以及运营商是否填写正确");
+    }
   } on DioException {
     rethrow;
   }

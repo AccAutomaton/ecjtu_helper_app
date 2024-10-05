@@ -2,7 +2,6 @@ import 'package:ecjtu_helper/pages/about.dart';
 import 'package:ecjtu_helper/pages/campus_network.dart';
 import 'package:ecjtu_helper/pages/library_webview.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class MainNavBarPage extends StatefulWidget {
   const MainNavBarPage({super.key});
@@ -14,7 +13,7 @@ class MainNavBarPage extends StatefulWidget {
 }
 
 class _MainNavBarPageState extends State<MainNavBarPage> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +34,7 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
             selectedIndex: _currentIndex,
             onDestinationSelected: (int index) {
               setState(() {
-                if (index != 1) {
-                  _currentIndex = index;
-                } else {
-                  Fluttertoast.showToast(
-                      msg: "该功能尚在测试中",
-                      gravity: ToastGravity.CENTER,
-                      backgroundColor: Colors.brown);
-                }
+                _currentIndex = index;
               });
             },
           ),
