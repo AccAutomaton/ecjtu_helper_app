@@ -6,7 +6,7 @@ import 'package:flutter_hms_scan_kit/scan_result.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import '../uitls/shared_preferences_utils.dart';
+import '../uitls/shared_preferences_util.dart';
 
 class LibraryWebviewPage extends StatefulWidget {
   const LibraryWebviewPage({super.key});
