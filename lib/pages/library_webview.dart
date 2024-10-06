@@ -150,7 +150,7 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                       await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (BuildContext context) {
-                          return const AutoLoginSettingsRoute();
+                          return const AutoLoginSettingsPage();
                         }),
                       );
                     },
@@ -220,16 +220,16 @@ final WebViewController libraryWebViewController = WebViewController()
   ))
   ..loadRequest(Uri.parse("http://lib2.ecjtu.edu.cn/"));
 
-class AutoLoginSettingsRoute extends StatefulWidget {
-  const AutoLoginSettingsRoute({super.key});
+class AutoLoginSettingsPage extends StatefulWidget {
+  const AutoLoginSettingsPage({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _AutoLoginSettingsRouteState();
+    return _AutoLoginSettingsPageState();
   }
 }
 
-class _AutoLoginSettingsRouteState extends State<AutoLoginSettingsRoute> {
+class _AutoLoginSettingsPageState extends State<AutoLoginSettingsPage> {
   final TextEditingController _usernameTextEditingController =
       TextEditingController();
   final TextEditingController _passwordTextEditingController =
