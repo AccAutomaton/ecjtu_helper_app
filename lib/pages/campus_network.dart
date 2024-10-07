@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:ecjtu_helper/uitls/campus_network_util.dart';
-import 'package:ecjtu_helper/uitls/shared_preferences_util.dart';
+import 'package:ecjtu_helper/utils/campus_network_util.dart';
+import 'package:ecjtu_helper/utils/shared_preferences_util.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 

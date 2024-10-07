@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:ecjtu_helper/pages/settings_page/settings_home.dart';
-import 'package:ecjtu_helper/uitls/dio_util.dart';
+import 'package:ecjtu_helper/utils/dio_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
