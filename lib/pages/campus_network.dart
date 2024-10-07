@@ -127,25 +127,52 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
 
   _onClickLoginButton() async {
     if (_usernameTextEditingController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "用户名不能为空", gravity: ToastGravity.CENTER, backgroundColor: Colors.red);
+      Fluttertoast.showToast(
+          msg: "用户名不能为空",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red);
       return;
     }
     if (_passwordTextEditingController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "密码不能为空", gravity: ToastGravity.CENTER, backgroundColor: Colors.red);
+      Fluttertoast.showToast(
+          msg: "密码不能为空",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red);
       return;
     }
-    if (_operatorSelected != 1 && _operatorSelected != 2 && _operatorSelected != 3 ) {
-      Fluttertoast.showToast(msg: "请选择运营商", gravity: ToastGravity.CENTER, backgroundColor: Colors.red);
+    if (_operatorSelected != 1 &&
+        _operatorSelected != 2 &&
+        _operatorSelected != 3) {
+      Fluttertoast.showToast(
+          msg: "请选择运营商",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red);
       return;
     }
-    Fluttertoast.showToast(msg: "登陆中", gravity: ToastGravity.TOP, backgroundColor: Colors.blue, fontSize: 18);
+    Fluttertoast.showToast(
+        msg: "登陆中",
+        gravity: ToastGravity.TOP,
+        backgroundColor: Colors.blue,
+        fontSize: 18);
     try {
       await logout();
-      await login(_usernameTextEditingController.text, _passwordTextEditingController.text, _operatorSelected);
+      await login(_usernameTextEditingController.text,
+          _passwordTextEditingController.text, _operatorSelected);
       _onLoginSuccess();
-    }
-    on DioException catch (e) {
-      Fluttertoast.showToast(msg: "错误：$e", gravity: ToastGravity.CENTER, backgroundColor: Colors.red);
+    } on DioException catch (e) {
+      switch (e.type) {
+        case DioExceptionType.connectionTimeout:
+          Fluttertoast.showToast(
+              msg: "错误：连接超时。请检查是否正确连接到校园网。",
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.red);
+          break;
+        default:
+          Fluttertoast.showToast(
+              msg: "错误：$e",
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.red);
+      }
     }
   }
 
@@ -154,15 +181,19 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
       saveData("campus_network_username", _usernameTextEditingController.text);
       saveData("campus_network_password", _passwordTextEditingController.text);
       saveData("campus_network_operator", _operatorSelected.toString());
-    }
-    else {
+    } else {
       saveData("campus_network_username", "");
       saveData("campus_network_password", "");
       saveData("campus_network_operator", "");
     }
-    saveData("campus_network_enableSavePassword", _savePasswordSelected.toString());
+    saveData(
+        "campus_network_enableSavePassword", _savePasswordSelected.toString());
     Fluttertoast.cancel();
-    Fluttertoast.showToast(msg: "登陆成功！", gravity: ToastGravity.TOP, backgroundColor: Colors.green, fontSize: 18);
+    Fluttertoast.showToast(
+        msg: "登陆成功！",
+        gravity: ToastGravity.TOP,
+        backgroundColor: Colors.green,
+        fontSize: 18);
   }
 }
 
