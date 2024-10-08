@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ecjtu_helper/pages/about_home.dart';
 import 'package:ecjtu_helper/pages/campus_network.dart';
 import 'package:ecjtu_helper/pages/library_webview.dart';
+import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -44,7 +45,7 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
           darkTheme: ThemeData.dark(),
           themeMode: provider.themeMode,
           home: Scaffold(
-            body: IndexedStack(
+            body: LazyLoadIndexedStack(
               index: _currentIndex,
               children: const [
                 LibraryWebviewPage(),
