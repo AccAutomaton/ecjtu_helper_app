@@ -25,16 +25,24 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
   void initState() {
     super.initState();
     readData("campus_network_username").then((data) => setState(() {
-          _usernameTextEditingController.text = data!;
+          if (data != null) {
+            _usernameTextEditingController.text = data;
+          }
         }));
     readData("campus_network_password").then((data) => setState(() {
-          _passwordTextEditingController.text = data!;
+          if (data != null) {
+            _passwordTextEditingController.text = data;
+          }
         }));
     readData("campus_network_enableSavePassword").then((data) => setState(() {
-          _savePasswordSelected = bool.tryParse(data!)!;
+          if (data != null) {
+            _savePasswordSelected = bool.tryParse(data)!;
+          }
         }));
     readData("campus_network_operator").then((data) => setState(() {
-          _operatorSelected = int.tryParse(data!)!;
+          if (data != null) {
+            _operatorSelected = int.tryParse(data)!;
+          }
         }));
   }
 

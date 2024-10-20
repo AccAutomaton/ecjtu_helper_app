@@ -13,6 +13,7 @@ import '../../utils/shared_preferences_util.dart';
 
 class LibraryWebviewPage extends StatefulWidget {
   const LibraryWebviewPage({super.key});
+  static bool loginFailedFlag = false;
 
   @override
   State<StatefulWidget> createState() {
@@ -203,7 +204,8 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                             if (isHasDefaultSeat != null) {
                               hasDefaultSeat = bool.parse(isHasDefaultSeat);
                               if (hasDefaultSeat) {
-                                readData("library_default_room_dev_id").then((roomDevId) {
+                                readData("library_default_room_dev_id")
+                                    .then((roomDevId) {
                                   libraryWebViewController.loadRequest(Uri.parse(
                                       "http://update.unifound.net/wxnotice/s.aspx?c=$roomDevId"));
                                 });
@@ -267,19 +269,27 @@ final WebViewController libraryWebViewController = WebViewController()
   }, onPageFinished: (String url) async {
     EasyLoading.dismiss();
     bool enableAutoLogin = false;
-    await readData("library_enableAutoLogin")
-        .then((data) => enableAutoLogin = bool.tryParse(data!)!);
+    await readData("library_enableAutoLogin").then((data) {
+      if (data != null) {
+        enableAutoLogin = bool.tryParse(data)!;
+      }
+    });
     if (enableAutoLogin) {
       String username = "", password = "";
       await readData("library_username").then((data) => username = data!);
       await readData("library_password").then((data) => password = data!);
       if (url.contains("rz.ecjtu.edu.cn")) {
-        libraryWebViewController.runJavaScript(
-            'document.getElementsByName("username")[0].value = "$username"');
-        libraryWebViewController.runJavaScript(
-            'document.getElementsByName("password")[0].value = "$password"');
-        libraryWebViewController.runJavaScript(
-            'document.getElementsByTagName("button")[0].click()');
+        if (!LibraryWebviewPage.loginFailedFlag) {
+          libraryWebViewController.runJavaScript(
+              'document.getElementsByName("username")[0].value = "$username"');
+          libraryWebViewController.runJavaScript(
+              'document.getElementsByName("password")[0].value = "$password"');
+          libraryWebViewController.runJavaScript(
+              'document.getElementsByTagName("button")[0].click()');
+          LibraryWebviewPage.loginFailedFlag = true;
+        }
+      } else {
+        LibraryWebviewPage.loginFailedFlag = false;
       }
       if (url.contains("cas.ecjtu.edu.cn")) {
         libraryWebViewController.runJavaScript(
