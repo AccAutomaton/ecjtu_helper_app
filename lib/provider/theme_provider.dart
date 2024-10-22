@@ -3,21 +3,20 @@ import 'package:flutter/material.dart';
 import '../utils/shared_preferences_util.dart';
 
 class ThemeProvider with ChangeNotifier {
-  static final ThemeProvider themeProvider = ThemeProvider();
-
   ThemeMode themeMode = ThemeMode.system;
 
-  static ThemeProvider get() {
-    return themeProvider;
+  ThemeProvider() {
+    readStringData("application_dark_mode").then((darkModeStringInt) {
+      if (darkModeStringInt != null) {
+        int darkMode = int.parse(darkModeStringInt);
+        themeMode = darkModeMap[darkMode]!;
+      }
+    });
+    notifyListeners();
   }
 
-  Future<void> init() async {
-    String? darkModeStringInt = await readData("application_dark_mode");
-    if (darkModeStringInt != null) {
-      int darkMode = int.parse(darkModeStringInt);
-      themeMode = darkModeMap[darkMode]!;
-      notifyListeners();
-    }
+  get() {
+    return themeMode;
   }
 
   setThemeMode(ThemeMode mode) async {
@@ -33,7 +32,7 @@ class ThemeProvider with ChangeNotifier {
         themeModeInt = "2";
         break;
     }
-    await saveData("application_dark_mode", themeModeInt);
+    await saveStringData("application_dark_mode", themeModeInt);
     themeMode = mode;
     notifyListeners();
   }}

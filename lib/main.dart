@@ -1,4 +1,6 @@
+import 'package:ecjtu_helper/provider/default_start_page_provider.dart';
 import 'package:ecjtu_helper/provider/theme_provider.dart';
+import 'package:ecjtu_helper/utils/shared_preferences_util.dart';
 import 'package:flutter/material.dart';
 import 'package:ecjtu_helper/pages/about_home.dart';
 import 'package:ecjtu_helper/pages/campus_network.dart';
@@ -8,7 +10,8 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => ThemeProvider.themeProvider),
+    ChangeNotifierProvider(create: (_) => ThemeProvider()),
+    ChangeNotifierProvider(create: (_) => DefaultStartPageProvider())
   ], child: const MainNavBarPage()));
 }
 
@@ -28,11 +31,19 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
   @override
   void initState() {
     super.initState();
-    ThemeProvider.themeProvider.init().then((onValue) {});
     hasUpdate().then((onValue) {
       bool hadUpdate = onValue.$1;
       if (hadUpdate) {
-        _isAboutPageBadgeVisible = true;
+        setState(() {
+          _isAboutPageBadgeVisible = true;
+        });
+      }
+    });
+    readIntData("default_start_page").then((value) {
+      if (value != null) {
+        setState(() {
+          _currentIndex = value;
+        });
       }
     });
   }

@@ -199,12 +199,12 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                         label: const Text("快速签到"),
                         onPressed: () {
                           bool hasDefaultSeat = false;
-                          readData("library_has_default_room_dev_id")
+                          readStringData("library_has_default_room_dev_id")
                               .then((isHasDefaultSeat) {
                             if (isHasDefaultSeat != null) {
                               hasDefaultSeat = bool.parse(isHasDefaultSeat);
                               if (hasDefaultSeat) {
-                                readData("library_default_room_dev_id")
+                                readStringData("library_default_room_dev_id")
                                     .then((roomDevId) {
                                   libraryWebViewController.loadRequest(Uri.parse(
                                       "http://update.unifound.net/wxnotice/s.aspx?c=$roomDevId"));
@@ -269,15 +269,15 @@ final WebViewController libraryWebViewController = WebViewController()
   }, onPageFinished: (String url) async {
     EasyLoading.dismiss();
     bool enableAutoLogin = false;
-    await readData("library_enableAutoLogin").then((data) {
+    await readStringData("library_enableAutoLogin").then((data) {
       if (data != null) {
         enableAutoLogin = bool.tryParse(data)!;
       }
     });
     if (enableAutoLogin) {
       String username = "", password = "";
-      await readData("library_username").then((data) => username = data!);
-      await readData("library_password").then((data) => password = data!);
+      await readStringData("library_username").then((data) => username = data!);
+      await readStringData("library_password").then((data) => password = data!);
       if (url.contains("rz.ecjtu.edu.cn")) {
         if (!LibraryWebviewPage.loginFailedFlag) {
           libraryWebViewController.runJavaScript(

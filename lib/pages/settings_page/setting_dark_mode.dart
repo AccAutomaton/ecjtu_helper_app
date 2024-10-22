@@ -25,56 +25,48 @@ class _DarkModeSettingState extends State<DarkModeSettingPage> {
         ),
         body: Center(
             child: FractionallySizedBox(
-                widthFactor: 0.95,
+                widthFactor: 0.9,
                 child:
                     Consumer(builder: (context, ThemeProvider provider, child) {
                   return ListView(children: [
-                    InkWell(
-                      onTap: () async {
-                        await provider.setThemeMode(ThemeMode.system);
-                      },
-                      child: ListTile(
-                        leading: const Icon(Icons.brightness_auto),
-                        title: const Text("跟随系统"),
-                        trailing: Checkbox(
-                            value: provider.themeMode == ThemeMode.system,
-                            activeColor: Colors.blue,
-                            onChanged: (bool? value) async {
-                              provider.setThemeMode(ThemeMode.system);
-                            }),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        provider.setThemeMode(ThemeMode.dark);
-                      },
-                      child: ListTile(
-                        leading: const Icon(Icons.dark_mode),
-                        title: const Text("开启"),
-                        trailing: Checkbox(
-                            value: provider.themeMode == ThemeMode.dark,
-                            activeColor: Colors.blue,
-                            onChanged: (bool? value) async {
-                              provider.setThemeMode(ThemeMode.dark);
-                            }),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        provider.setThemeMode(ThemeMode.light);
-                      },
-                      child: ListTile(
-                        leading: const Icon(Icons.light_mode),
-                        title: const Text("关闭"),
-                        trailing: Checkbox(
-                            value: provider.themeMode == ThemeMode.light,
-                            activeColor: Colors.blue,
-                            onChanged: (bool? value) async {
-                              provider.setThemeMode(ThemeMode.light);
-                            }),
-                      ),
-                    ),
+                    darkModeOptionInkWell(
+                        provider: provider,
+                        themeMode: ThemeMode.system,
+                        icon: const Icon(Icons.brightness_auto),
+                        title: "跟随系统"),
+                    darkModeOptionInkWell(
+                        provider: provider,
+                        themeMode: ThemeMode.dark,
+                        icon: const Icon(Icons.dark_mode),
+                        title: "开启"),
+                    darkModeOptionInkWell(
+                        provider: provider,
+                        themeMode: ThemeMode.light,
+                        icon: const Icon(Icons.light_mode),
+                        title: "关闭"),
                   ]);
                 }))));
   }
+}
+
+InkWell darkModeOptionInkWell(
+    {required ThemeProvider provider,
+    required ThemeMode themeMode,
+    required Icon icon,
+    required String title}) {
+  return InkWell(
+    onTap: () async {
+      await provider.setThemeMode(themeMode);
+    },
+    child: ListTile(
+      leading: icon,
+      title: Text(title),
+      trailing: Checkbox(
+          value: provider.themeMode == themeMode,
+          activeColor: Colors.blue,
+          onChanged: (bool? value) async {
+            provider.setThemeMode(themeMode);
+          }),
+    ),
+  );
 }

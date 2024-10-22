@@ -24,17 +24,17 @@ class _LibraryAutoLoginSettingPageState
   @override
   void initState() {
     super.initState();
-    readData("library_username").then((data) => setState(() {
+    readStringData("library_username").then((data) => setState(() {
           if (data != null) {
             _usernameTextEditingController.text = data;
           }
         }));
-    readData("library_password").then((data) => setState(() {
+    readStringData("library_password").then((data) => setState(() {
           if (data != null) {
             _passwordTextEditingController.text = data;
           }
         }));
-    readData("library_enableAutoLogin").then((data) => setState(() {
+    readStringData("library_enableAutoLogin").then((data) => setState(() {
           if (data != null) {
             _enableAutoLogin = bool.tryParse(data)!;
           }
@@ -70,7 +70,7 @@ class _LibraryAutoLoginSettingPageState
                         onChanged: (newValue) {
                           setState(() {
                             _enableAutoLogin = newValue;
-                            saveData(
+                            saveStringData(
                                 "library_enableAutoLogin", newValue.toString());
                           });
                         }),
@@ -112,9 +112,9 @@ class _LibraryAutoLoginSettingPageState
                 icon: const Icon(Icons.save),
                 label: const Text("保存凭据"),
                 onPressed: () {
-                  saveData(
+                  saveStringData(
                       "library_username", _usernameTextEditingController.text);
-                  saveData(
+                  saveStringData(
                       "library_password", _passwordTextEditingController.text);
                   LibraryWebviewPage.loginFailedFlag = false;
                   Fluttertoast.showToast(

@@ -24,14 +24,14 @@ class _LibraryDefaultSeatSettingPageState
   @override
   void initState() {
     super.initState();
-    readData("library_has_default_room_dev_id").then((hasDefaultSeat) {
+    readStringData("library_has_default_room_dev_id").then((hasDefaultSeat) {
       setState(() {
         if (hasDefaultSeat != null) {
           _hasDefaultSeat = bool.parse(hasDefaultSeat);
         }
       });
       if (bool.parse(hasDefaultSeat!)) {
-        readData("library_default_room_dev_id").then((defaultSeat) {
+        readStringData("library_default_room_dev_id").then((defaultSeat) {
           setState(() {
             _defaultSeat = defaultSeat!;
           });
@@ -68,8 +68,8 @@ class _LibraryDefaultSeatSettingPageState
                     String? url = _scanResult?.value;
                     if (url!.contains("http://update.unifound.net/wxnotice/s.aspx?c=")) {
                       String devId = url.substring(url.indexOf("=") + 1);
-                      saveData("library_default_room_dev_id", devId);
-                      saveData("library_has_default_room_dev_id", true.toString());
+                      saveStringData("library_default_room_dev_id", devId);
+                      saveStringData("library_has_default_room_dev_id", true.toString());
                       setState(() {
                         _defaultSeat = devId;
                         _hasDefaultSeat = true;

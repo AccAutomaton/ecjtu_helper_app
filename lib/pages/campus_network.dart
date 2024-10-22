@@ -24,22 +24,22 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
   @override
   void initState() {
     super.initState();
-    readData("campus_network_username").then((data) => setState(() {
+    readStringData("campus_network_username").then((data) => setState(() {
           if (data != null) {
             _usernameTextEditingController.text = data;
           }
         }));
-    readData("campus_network_password").then((data) => setState(() {
+    readStringData("campus_network_password").then((data) => setState(() {
           if (data != null) {
             _passwordTextEditingController.text = data;
           }
         }));
-    readData("campus_network_enableSavePassword").then((data) => setState(() {
+    readStringData("campus_network_enableSavePassword").then((data) => setState(() {
           if (data != null) {
             _savePasswordSelected = bool.tryParse(data)!;
           }
         }));
-    readData("campus_network_operator").then((data) => setState(() {
+    readStringData("campus_network_operator").then((data) => setState(() {
           if (data != null) {
             _operatorSelected = int.tryParse(data)!;
           }
@@ -186,15 +186,15 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
 
   _onLoginSuccess() {
     if (_savePasswordSelected) {
-      saveData("campus_network_username", _usernameTextEditingController.text);
-      saveData("campus_network_password", _passwordTextEditingController.text);
-      saveData("campus_network_operator", _operatorSelected.toString());
+      saveStringData("campus_network_username", _usernameTextEditingController.text);
+      saveStringData("campus_network_password", _passwordTextEditingController.text);
+      saveStringData("campus_network_operator", _operatorSelected.toString());
     } else {
-      saveData("campus_network_username", "");
-      saveData("campus_network_password", "");
-      saveData("campus_network_operator", "");
+      saveStringData("campus_network_username", "");
+      saveStringData("campus_network_password", "");
+      saveStringData("campus_network_operator", "");
     }
-    saveData(
+    saveStringData(
         "campus_network_enableSavePassword", _savePasswordSelected.toString());
     Fluttertoast.cancel();
     Fluttertoast.showToast(
