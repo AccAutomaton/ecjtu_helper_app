@@ -26,3 +26,13 @@ Future<int?> readIntData(String key) async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getInt(key);
 }
+
+Future<void> saveBoolData(String key, bool value) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(key, value);
+}
+
+Future<bool?> readBoolData(String key) async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(key);
+}

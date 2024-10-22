@@ -1,5 +1,6 @@
 import 'package:ecjtu_helper/pages/settings_page/settings_dark_mode/setting_dark_mode_entrance.dart';
 import 'package:ecjtu_helper/pages/settings_page/settings_default_start_page/setting_default_start_page_entrance.dart';
+import 'package:ecjtu_helper/pages/settings_page/settings_library/setting_library_auto_login_switch.dart';
 import 'package:flutter/material.dart';
 
 class SettingsHomePage extends StatefulWidget {
@@ -28,6 +29,7 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
             const SettingDefaultStartPageEntranceModule(),
             lightGreyDivider,
             settingLabel("图书馆"),
+            const SettingLibraryAutoLoginSwitch(),
             lightGreyDivider,
             settingLabel("校园网"),
             lightGreyDivider,
