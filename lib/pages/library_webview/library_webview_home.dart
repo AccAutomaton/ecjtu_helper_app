@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:ecjtu_helper/pages/library_webview/setting_auto_login_library.dart';
-import 'package:ecjtu_helper/pages/library_webview/setting_default_seat_library.dart';
+import 'package:ecjtu_helper/pages/library_webview/library_settings.dart';
+import 'package:ecjtu_helper/pages/settings_page/settings_library/setting_library_default_seat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hms_scan_kit/flutter_hms_scan_kit.dart';
@@ -13,6 +13,7 @@ import '../../utils/shared_preferences_util.dart';
 
 class LibraryWebviewPage extends StatefulWidget {
   const LibraryWebviewPage({super.key});
+
   static bool loginFailedFlag = false;
 
   @override
@@ -116,22 +117,6 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                       _menuController.close();
                     },
                   ),
-                  ElevatedButton.icon(
-                    style: _menuChildrenButtonStyle,
-                    icon: const Icon(Icons.settings),
-                    label: const Text("自动登录设置"),
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (BuildContext context) {
-                          return const LibraryAutoLoginSettingPage();
-                        }),
-                      );
-                      libraryWebViewController
-                          .loadRequest(Uri.parse("http://lib2.ecjtu.edu.cn/"));
-                      _menuController.close();
-                    },
-                  ),
                 ],
               ),
               actions: [
@@ -151,6 +136,18 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                             backgroundColor: Colors.yellow[800]);
                       }
                     });
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.settings_outlined),
+                  onPressed: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) {
+                            return const LibrarySettingsPage();
+                          }),
+                    );
                   },
                 ),
               ],
@@ -221,7 +218,7 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                           await Navigator.push(
                             context,
                             MaterialPageRoute(builder: (BuildContext context) {
-                              return const LibraryDefaultSeatSettingPage();
+                              return const SettingLibraryDefaultSeatPage();
                             }),
                           );
                           _menuController.close();
