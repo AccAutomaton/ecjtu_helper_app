@@ -1,9 +1,10 @@
-import 'package:ecjtu_helper/pages/settings_page/settings_default_start_page/setting_default_start_page.dart';
+import 'package:ecjtu_helper/pages/settings_page/settings_general/settings_default_start_page/setting_default_start_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../provider/default_start_page_provider.dart';
+import '../../../../provider/default_start_page_provider.dart';
+
 
 class SettingDefaultStartPageEntranceModule extends StatefulWidget {
   const SettingDefaultStartPageEntranceModule({super.key});

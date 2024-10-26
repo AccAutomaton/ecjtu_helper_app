@@ -1,9 +1,9 @@
-import 'package:ecjtu_helper/pages/settings_page/settings_dark_mode/setting_dark_mode.dart';
+import 'package:ecjtu_helper/pages/settings_page/settings_general/settings_dark_mode/setting_dark_mode.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../provider/theme_provider.dart';
+import '../../../../provider/theme_provider.dart';
 
 class SettingDarkModeEntranceModule extends StatefulWidget {
   const SettingDarkModeEntranceModule({super.key});
