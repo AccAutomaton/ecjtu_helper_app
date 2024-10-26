@@ -1,6 +1,9 @@
+import 'package:action_slider/action_slider.dart';
 import 'package:dio/dio.dart';
+import 'package:ecjtu_helper/pages/settings_page/settings_campus_network/setting_campus_network_credential.dart';
 import 'package:ecjtu_helper/utils/campus_network_util.dart';
 import 'package:ecjtu_helper/utils/shared_preferences_util.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -14,159 +17,140 @@ class CampusNetworkPage extends StatefulWidget {
 }
 
 class _CampusNetworkPageState extends State<CampusNetworkPage> {
-  final TextEditingController _usernameTextEditingController =
-      TextEditingController();
-  final TextEditingController _passwordTextEditingController =
-      TextEditingController();
-  bool _savePasswordSelected = true;
-  int? _operatorSelected;
-
-  @override
-  void initState() {
-    super.initState();
-    readStringData("campus_network_username").then((data) => setState(() {
-          if (data != null) {
-            _usernameTextEditingController.text = data;
-          }
-        }));
-    readStringData("campus_network_password").then((data) => setState(() {
-          if (data != null) {
-            _passwordTextEditingController.text = data;
-          }
-        }));
-    readStringData("campus_network_enableSavePassword").then((data) => setState(() {
-          if (data != null) {
-            _savePasswordSelected = bool.tryParse(data)!;
-          }
-        }));
-    readStringData("campus_network_operator").then((data) => setState(() {
-          if (data != null) {
-            _operatorSelected = int.tryParse(data)!;
-          }
-        }));
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-      const Image(
-        image: AssetImage("images/icon_ecjtu_256.png"),
-        width: 125,
-      ),
-      Container(
-        margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-        child: const Text(
-          "校园网登录",
-          textDirection: TextDirection.ltr,
-          style: TextStyle(fontSize: 32),
-        ),
-      ),
-      Container(
-        margin: const EdgeInsets.fromLTRB(60, 20, 60, 10),
-        child: TextField(
-          decoration: const InputDecoration(
-            labelText: "用户名",
-            hintText: "请输入用户名",
-            prefixIcon: Icon(Icons.person),
-          ),
-          controller: _usernameTextEditingController,
-        ),
-      ),
-      Container(
-        margin: const EdgeInsets.fromLTRB(60, 10, 60, 20),
-        child: TextField(
-          decoration: const InputDecoration(
-              labelText: "密码", hintText: "请输入密码", prefixIcon: Icon(Icons.lock)),
-          obscureText: true,
-          controller: _passwordTextEditingController,
-        ),
-      ),
-      Container(
-          margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-          child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-            Container(
-              margin: const EdgeInsets.fromLTRB(0, 0, 20, 0),
-              child: const Text("运营商"),
-            ),
-            DropdownButton(
-              hint: const Text("请选择运营商"),
-              value: _operatorSelected,
-              onChanged: (newValue) {
-                setState(() {
-                  _operatorSelected = newValue!;
-                });
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("华东交通大学校园网"),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (BuildContext context) {
+                    return const SettingCampusNetworkCredentialPage();
+                  }),
+                );
               },
-              items: operatorList,
             ),
-          ])),
-      Container(
-        margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Checkbox(
-                value: _savePasswordSelected,
-                activeColor: Colors.blueAccent,
-                onChanged: (newValue) {
-                  setState(() {
-                    _savePasswordSelected = newValue!;
-                  });
-                }),
-            const Text(
-              "保存密码，下次自动填充",
-              textDirection: TextDirection.ltr,
-            )
           ],
         ),
-      ),
-      Container(
-        margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-        child: ElevatedButton.icon(
-          icon: const Icon(Icons.login),
-          label: const Text("刷新/登录"),
-          onPressed: _onClickLoginButton,
-          style: const ButtonStyle(
-              minimumSize: WidgetStatePropertyAll(Size(160, 60))),
-        ),
-      )
-    ]));
+        body: Center(
+          child: FractionallySizedBox(
+              widthFactor: 0.7,
+              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                Container(
+                    margin: const EdgeInsets.fromLTRB(0, 20, 0, 10),
+                    child: ActionSlider.standard(
+                      icon: const Image(
+                        image: AssetImage("images/icon_ecjtu_256.png"),
+                      ),
+                      rolling: true,
+                      toggleColor: const Color.fromRGBO(204, 255, 255, 0.1),
+                      successIcon: const Icon(
+                        Icons.check_rounded,
+                        color: Colors.green,
+                        size: 40,
+                      ),
+                      failureIcon: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.red,
+                        size: 40,
+                      ),
+                      action: (controller) async {
+                        controller.loading();
+                        if (await _onClickLoginButton()) {
+                          controller.success();
+                          Fluttertoast.showToast(
+                            msg: "登陆成功！",
+                            gravity: ToastGravity.CENTER,
+                            backgroundColor: Colors.green,
+                          );
+                          await Future.delayed(const Duration(seconds: 10));
+                          controller.reset();
+                        } else {
+                          controller.failure();
+                          await Future.delayed(const Duration(seconds: 3));
+                          controller.reset();
+                        }
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Container(),
+                          ),
+                          const Expanded(
+                            flex: 8,
+                            child: Text('向右滑动以连接世界'),
+                          ),
+                          const Expanded(
+                            flex: 2,
+                            child: Icon(Icons.login_outlined),
+                          ),
+                        ],
+                      ),
+                    ))
+              ])),
+        ));
   }
 
-  _onClickLoginButton() async {
-    if (_usernameTextEditingController.text.isEmpty) {
+  Future<bool> _onClickLoginButton() async {
+    if (kDebugMode) {
+      await Future.delayed(const Duration(seconds: 3));
+      return true;
+    }
+
+    String? username = await readStringData("campus_network_username");
+    String? password = await readStringData("campus_network_password");
+    String? operator = await readStringData("campus_network_operator");
+    late int operatorSelected;
+
+    if (username == null || password == null || operator == null) {
       Fluttertoast.showToast(
-          msg: "用户名不能为空",
+          msg: "请先设置校园网登录凭据",
           gravity: ToastGravity.CENTER,
           backgroundColor: Colors.red);
-      return;
+      return false;
     }
-    if (_passwordTextEditingController.text.isEmpty) {
+
+    if (username.isEmpty) {
       Fluttertoast.showToast(
-          msg: "密码不能为空",
+          msg: "校园网(智慧交大)用户名不能为空",
           gravity: ToastGravity.CENTER,
           backgroundColor: Colors.red);
-      return;
+      return false;
     }
-    if (_operatorSelected != 1 &&
-        _operatorSelected != 2 &&
-        _operatorSelected != 3) {
+    if (password.isEmpty) {
+      Fluttertoast.showToast(
+          msg: "校园网(智慧交大)密码不能为空",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red);
+      return false;
+    }
+    if (operator.isEmpty) {
       Fluttertoast.showToast(
           msg: "请选择运营商",
           gravity: ToastGravity.CENTER,
           backgroundColor: Colors.red);
-      return;
+      return false;
+    } else {
+      operatorSelected = int.tryParse(operator)!;
+      if (!(operatorSelected >= 1 && operatorSelected <= 3)) {
+        Fluttertoast.showToast(
+            msg: "请选择运营商",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red);
+        return false;
+      }
     }
-    Fluttertoast.showToast(
-        msg: "登陆中",
-        gravity: ToastGravity.TOP,
-        backgroundColor: Colors.blue,
-        fontSize: 18);
+
     try {
       await logout();
-      await login(_usernameTextEditingController.text,
-          _passwordTextEditingController.text, _operatorSelected);
-      _onLoginSuccess();
+      await login(username, password, operatorSelected);
     } on DioException catch (e) {
       switch (e.type) {
         case DioExceptionType.connectionTimeout:
@@ -181,27 +165,9 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
               gravity: ToastGravity.CENTER,
               backgroundColor: Colors.red);
       }
+      return false;
     }
-  }
-
-  _onLoginSuccess() {
-    if (_savePasswordSelected) {
-      saveStringData("campus_network_username", _usernameTextEditingController.text);
-      saveStringData("campus_network_password", _passwordTextEditingController.text);
-      saveStringData("campus_network_operator", _operatorSelected.toString());
-    } else {
-      saveStringData("campus_network_username", "");
-      saveStringData("campus_network_password", "");
-      saveStringData("campus_network_operator", "");
-    }
-    saveStringData(
-        "campus_network_enableSavePassword", _savePasswordSelected.toString());
-    Fluttertoast.cancel();
-    Fluttertoast.showToast(
-        msg: "登陆成功！",
-        gravity: ToastGravity.TOP,
-        backgroundColor: Colors.green,
-        fontSize: 18);
+    return true;
   }
 }
 

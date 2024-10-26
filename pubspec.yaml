@@ -53,6 +53,7 @@ dependencies:
   flutter_markdown: ^0.7.3+2
   lazy_load_indexed_stack: ^1.1.0
   flutter_easyloading: ^3.0.5
+  action_slider: ^0.7.0
 
 dev_dependencies:
   flutter_test:

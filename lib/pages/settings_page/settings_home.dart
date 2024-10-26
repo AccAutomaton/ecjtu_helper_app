@@ -1,3 +1,4 @@
+import 'package:ecjtu_helper/pages/settings_page/settings_campus_network/setting_campus_network_credential_entrance.dart';
 import 'package:ecjtu_helper/pages/settings_page/settings_general/settings_dark_mode/setting_dark_mode_entrance.dart';
 import 'package:ecjtu_helper/pages/settings_page/settings_general/settings_default_start_page/setting_default_start_page_entrance.dart';
 import 'package:ecjtu_helper/pages/settings_page/settings_library/setting_library_auto_login_switch.dart';
@@ -36,6 +37,7 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
             const SettingLibraryDefaultSeatEntranceModule(),
             lightGreyDivider,
             settingLabel("校园网"),
+            const SettingCampusNetworkCredentialEntranceModule(),
             lightGreyDivider,
           ]),
         )));
