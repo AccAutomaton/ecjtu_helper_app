@@ -216,7 +216,7 @@ class _AboutPageState extends State<AboutPage> {
                     ],
                   )),
               Expanded(
-                  flex: 4,
+                  flex: 3,
                   child: Column(
                     children: [
                       Row(
@@ -228,20 +228,6 @@ class _AboutPageState extends State<AboutPage> {
                               onPressed: () {
                                 launchUrlString(
                                     "https://github.com/AccAutomaton/ecjtu_helper_app/issues");
-                              })
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          const Text("Build signature: ",
-                              style: TextStyle(color: Colors.grey)),
-                          FutureBuilder(
-                              future: _getBuildSignature(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot snapshot) {
-                                return Text("${snapshot.data}",
-                                    style: const TextStyle(color: Colors.grey));
                               })
                         ],
                       ),
@@ -261,11 +247,6 @@ class _AboutPageState extends State<AboutPage> {
 Future<String> _getAppAndBuildVersion() async {
   PackageInfo info = await PackageInfo.fromPlatform();
   return "${info.version} Build ${info.buildNumber}";
-}
-
-Future<String> _getBuildSignature() async {
-  PackageInfo info = await PackageInfo.fromPlatform();
-  return info.buildSignature;
 }
 
 Future<(bool, String?)> hasUpdate() async {
