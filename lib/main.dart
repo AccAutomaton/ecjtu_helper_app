@@ -25,7 +25,7 @@ class MainNavBarPage extends StatefulWidget {
 }
 
 class _MainNavBarPageState extends State<MainNavBarPage> {
-  int _currentIndex = 1;
+  int _currentIndex = 2;
   bool _isAboutPageBadgeVisible = false;
 
   @override
