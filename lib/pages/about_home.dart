@@ -32,7 +32,7 @@ class _AboutPageState extends State<AboutPage> {
       String? newVersion = onValue.$2;
       if (hadUpdate) {
         setState(() {
-          _checkUpdateTitle = Text("发现新版本: ${newVersion!}",
+          _checkUpdateTitle = Text("发现新版本: $newVersion",
               style: const TextStyle(color: Colors.red));
         });
       }
@@ -107,12 +107,12 @@ class _AboutPageState extends State<AboutPage> {
                                     msg: "正在检查更新...",
                                     gravity: ToastGravity.CENTER);
                                 late bool hadUpdate;
-                                late String? newVersion;
+                                late String newVersion;
                                 (hadUpdate, newVersion) = await hasUpdate();
                                 if (hadUpdate) {
                                   setState(() {
                                     _checkUpdateTitle = Text(
-                                        "发现新版本: ${newVersion!}",
+                                        "发现新版本: $newVersion",
                                         style:
                                             const TextStyle(color: Colors.red));
                                   });
@@ -123,7 +123,7 @@ class _AboutPageState extends State<AboutPage> {
                                         return AlertDialog(
                                           icon:
                                               const Icon(Icons.backup_outlined),
-                                          title: Text("发现新版本: ${newVersion!}"),
+                                          title: Text("发现新版本: $newVersion"),
                                           content: const Center(
                                               heightFactor: 0.5,
                                               widthFactor: 10,
@@ -139,7 +139,7 @@ class _AboutPageState extends State<AboutPage> {
                                               child: const Text('确认'),
                                               onPressed: () {
                                                 launchUrlString(
-                                                    "https://cdn.acautomaton.com/ecjtu_helper/ecjtu_helper-release-latest.apk");
+                                                    "https://cdn.acautomaton.com/ecjtu_helper/ecjtu_helper-release-$newVersion.apk");
                                                 Navigator.of(context).pop();
                                               },
                                             ),
@@ -249,14 +249,17 @@ Future<String> _getAppAndBuildVersion() async {
   return "${info.version} Build ${info.buildNumber}";
 }
 
-Future<(bool, String?)> hasUpdate() async {
+Future<(bool, String)> hasUpdate() async {
   Response response = await dio.get(
       "https://toolbox.acautomaton.com/api/ecjtu_helper/v1alpha1/getUpdateInformation",
       options: Options(responseType: ResponseType.plain));
   if (response.statusCode == HttpStatus.ok) {
     var json = jsonDecode(response.data.toString());
     String? version = json["latest_version"];
-    if ((await PackageInfo.fromPlatform()).version != version) {
+    if (version == null) {
+      return (false, "");
+    }
+    else if ((await PackageInfo.fromPlatform()).version != version) {
       return (true, version);
     }
   }

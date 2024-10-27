@@ -26,17 +26,17 @@ class _SettingLibraryDefaultSeatPage extends State<SettingLibraryDefaultSeatPage
   void initState() {
     super.initState();
     readStringData("library_has_default_room_dev_id").then((hasDefaultSeat) {
-      setState(() {
-        if (hasDefaultSeat != null) {
+      if (hasDefaultSeat != null) {
+        setState(() {
           _hasDefaultSeat = bool.parse(hasDefaultSeat);
-        }
-      });
-      if (bool.parse(hasDefaultSeat!)) {
-        readStringData("library_default_room_dev_id").then((defaultSeat) {
-          setState(() {
-            _defaultSeat = defaultSeat!;
-          });
         });
+        if (_hasDefaultSeat) {
+          readStringData("library_default_room_dev_id").then((defaultSeat) {
+            setState(() {
+              _defaultSeat = defaultSeat!;
+            });
+          });
+        }
       }
     });
   }
