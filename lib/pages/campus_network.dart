@@ -5,6 +5,7 @@ import 'package:ecjtu_helper/utils/campus_network_util.dart';
 import 'package:ecjtu_helper/utils/shared_preferences_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class CampusNetworkPage extends StatefulWidget {
@@ -60,8 +61,10 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
                         size: 40,
                       ),
                       action: (controller) async {
+                        HapticFeedback.lightImpact();
                         controller.loading();
                         if (await _onClickLoginButton()) {
+                          HapticFeedback.mediumImpact();
                           controller.success();
                           Fluttertoast.showToast(
                             msg: "登陆成功！",
@@ -71,6 +74,7 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
                           await Future.delayed(const Duration(seconds: 10));
                           controller.reset();
                         } else {
+                          HapticFeedback.heavyImpact();
                           controller.failure();
                           await Future.delayed(const Duration(seconds: 3));
                           controller.reset();
