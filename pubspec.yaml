@@ -54,6 +54,8 @@ dependencies:
   lazy_load_indexed_stack: ^1.1.0
   flutter_easyloading: ^3.0.5
   action_slider: ^0.7.0
+  webview_cookie_manager: ^2.0.6
+#  sqflite: ^2.3.3+1
 
 dev_dependencies:
   flutter_test:
@@ -83,8 +85,14 @@ flutter:
     - images/icon_acautomaton.png
 
     - docs/update_log.md
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+
+    - jsons/library/labId_100531890.json
+    - jsons/library/labId_103762297.json
+    - jsons/library/labId_103762299.json
+    - jsons/library/labId_103762301.json
+    - jsons/library/labId_103763032.json
+    - jsons/library/labId_103763034.json
+    - jsons/library/labId_104556463.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
