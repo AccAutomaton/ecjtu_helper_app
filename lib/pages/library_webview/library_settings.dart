@@ -27,6 +27,9 @@ class _LibrarySettingsPage extends State<LibrarySettingsPage> {
             SettingLibraryAutoLoginSwitchModule(),
             SettingLibraryCredentialEntranceModule(),
             SettingLibraryDefaultSeatEntranceModule(),
+            Center(
+              child: Text("设置完成后请在左上角刷新图书馆页面", style: TextStyle(color: Colors.grey)),
+            )
           ]),
         )));
   }

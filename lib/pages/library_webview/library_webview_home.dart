@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:ecjtu_helper/pages/library_webview/library_settings.dart';
 import 'package:ecjtu_helper/pages/settings_page/settings_library/setting_library_default_seat.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hms_scan_kit/flutter_hms_scan_kit.dart';
 import 'package:flutter_hms_scan_kit/scan_result.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../utils/shared_preferences_util.dart';
@@ -147,8 +149,9 @@ Widget buttonToClearRefresh(MenuController menuController) {
   return ElevatedButton.icon(
     style: menuChildrenButtonStyle,
     icon: const Icon(Icons.delete_forever_outlined),
-    label: const Text("清除缓存并刷新"),
+    label: const Text("清除数据并刷新"),
     onPressed: () {
+      webViewCookieManager.removeCookie("lib2.ecjtu.edu.cn");
       libraryWebViewController.clearCache();
       libraryWebViewController.clearLocalStorage();
       libraryWebViewController.reload();
@@ -160,20 +163,18 @@ Widget buttonToClearRefresh(MenuController menuController) {
 Widget buttonToScanQRCode() {
   return IconButton(
     icon: const Icon(Icons.qr_code_scanner),
-    onPressed: () {
-      libraryWebViewController.currentUrl().then((url) async {
-        if (url!.contains("lib2.ecjtu.edu.cn")) {
-          ScanResult? scanResult = await FlutterHmsScanKit.startScan();
-          String? to = "http://lib2.ecjtu.edu.cn/";
-          to = scanResult?.value;
-          libraryWebViewController.loadRequest(Uri.parse(to!));
-        } else {
-          Fluttertoast.showToast(
-              msg: "请先登录图书馆再扫码",
-              gravity: ToastGravity.CENTER,
-              backgroundColor: Colors.yellow[800]);
-        }
-      });
+    onPressed: () async {
+      if (await isLibraryLogin()) {
+        ScanResult? scanResult = await FlutterHmsScanKit.startScan();
+        String? to = "http://lib2.ecjtu.edu.cn/";
+        to = scanResult?.value;
+        libraryWebViewController.loadRequest(Uri.parse(to!));
+      } else {
+        Fluttertoast.showToast(
+            msg: "请先登录图书馆再扫码",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.yellow[800]);
+      }
     },
   );
 }
@@ -196,7 +197,7 @@ Widget buttonToQuickAppointment() {
   return ElevatedButton.icon(
     icon: const Icon(Icons.fast_forward_outlined),
     label: const Text("快速预约"),
-    onPressed: () {
+    onPressed: () async {
       // TODO
       Fluttertoast.showToast(msg: "敬请期待", gravity: ToastGravity.CENTER);
     },
@@ -222,23 +223,31 @@ Widget buttonToQuickCheck(
   return ElevatedButton.icon(
     icon: const Icon(Icons.fact_check_outlined),
     label: const Text("快速签到"),
-    onPressed: () {
-      bool hasDefaultSeat = false;
-      readStringData("library_has_default_room_dev_id")
-          .then((isHasDefaultSeat) {
-        if (isHasDefaultSeat != null) {
-          hasDefaultSeat = bool.parse(isHasDefaultSeat);
-          if (hasDefaultSeat) {
-            readStringData("library_default_room_dev_id").then((roomDevId) {
-              libraryWebViewController.loadRequest(Uri.parse(
-                  "http://update.unifound.net/wxnotice/s.aspx?c=$roomDevId"));
-            });
-            return;
+    onPressed: () async {
+      if (await isLibraryLogin()) {
+        bool hasDefaultSeat = false;
+        readStringData("library_has_default_room_dev_id")
+            .then((isHasDefaultSeat) {
+          if (isHasDefaultSeat != null) {
+            hasDefaultSeat = bool.parse(isHasDefaultSeat);
+            if (hasDefaultSeat) {
+              readStringData("library_default_room_dev_id").then((roomDevId) {
+                libraryWebViewController.loadRequest(Uri.parse(
+                    "http://update.unifound.net/wxnotice/s.aspx?c=$roomDevId"));
+              });
+              return;
+            }
           }
-        }
+          Fluttertoast.showToast(
+              msg: "尚未设置默认座位，请长按该按钮进行设置。", gravity: ToastGravity.CENTER);
+        });
+      }
+      else {
         Fluttertoast.showToast(
-            msg: "尚未设置默认座位，请长按该按钮进行设置。", gravity: ToastGravity.CENTER);
-      });
+            msg: "请先登录图书馆再签到",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.yellow[800]);
+      }
     },
     onLongPress: () async {
       await Navigator.push(
@@ -314,3 +323,21 @@ final WebViewController libraryWebViewController = WebViewController()
     EasyLoading.dismiss();
   }))
   ..loadRequest(Uri.parse("http://lib2.ecjtu.edu.cn/"));
+
+final WebviewCookieManager webViewCookieManager = WebviewCookieManager();
+
+Future<bool> isLibraryLogin() async {
+  List<Cookie> cookieList =
+      await webViewCookieManager.getCookies("lib2.ecjtu.edu.cn");
+  int count = 0;
+  if (cookieList.length >= 2) {
+    for (Cookie cookie in cookieList) {
+      if (cookie.name == "wengine_new_ticket") {
+        count++;
+      } else if (cookie.name == "ic-cookie") {
+        count++;
+      }
+    }
+  }
+  return count >= 2;
+}

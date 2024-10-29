@@ -58,27 +58,17 @@ class _SettingLibraryDefaultSeatPage
                 Expanded(flex: 1, child: Container()),
                 Column(
                   children: [
-                    const Text("当前默认座位", style: TextStyle(color: Colors.grey)),
                     if (_hasDefaultSeat) ...[
-                      FutureBuilder(
-                          future: getDetailInformation(_defaultSeat!),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
-                              return defaultSeatInformation(snapshot.data.$1,
-                                  snapshot.data.$2, snapshot.data.$3);
-                            }
-                            else {
-                              return const Text("加载中");
-                            }
-                          })
+                      defaultSeatFutureBuilder(_defaultSeat!),
                     ] else ...[
-                      const Text("无")
+                      const Text("当前默认座位",
+                          style: TextStyle(color: Colors.grey)),
+                      const Text("无"),
                     ]
                   ],
                 ),
                 Container(
-                  margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                  margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                   child: ElevatedButton.icon(
                     onPressed: () async {
                       _scanResult = await FlutterHmsScanKit.startScan();
@@ -134,15 +124,40 @@ Future<(String labName, String roomName, String devName)> getDetailInformation(
   return (labName, roomName, devName);
 }
 
-Widget defaultSeatInformation(String labName, String roomName, String devName) {
-  return Container(
-    margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-    child: Column(
-      children: [
-        Text(labName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
-        Text(roomName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 24)),
-        Text(devName, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 32)),
-      ],
-    ),
+Widget defaultSeatFutureBuilder(String defaultSeat) {
+  return FutureBuilder(
+      future: getDetailInformation(defaultSeat),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return defaultSeatWidget(
+              snapshot.data.$1, snapshot.data.$2, snapshot.data.$3);
+        } else {
+          return const Text("加载中");
+        }
+      });
+}
+
+Widget defaultSeatWidget(String labName, String roomName, String devName) {
+  return Column(
+    children: [
+      const Text("默认座位", style: TextStyle(color: Colors.grey)),
+      Row(
+        children: [
+          Text(labName,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+          Container(
+            margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: const Text("/",
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 24)),
+          ),
+          Text(roomName,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+        ],
+      ),
+      Text(devName,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 24)),
+    ],
   );
 }
