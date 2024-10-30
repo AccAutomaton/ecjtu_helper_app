@@ -1,3 +1,4 @@
+import 'package:ecjtu_helper/pages/settings_page/settings_library/setting_library_appointment_entrance.dart';
 import 'package:flutter/material.dart';
 
 import '../settings_page/settings_library/setting_library_auto_login_switch.dart';
@@ -27,6 +28,7 @@ class _LibrarySettingsPage extends State<LibrarySettingsPage> {
             SettingLibraryAutoLoginSwitchModule(),
             SettingLibraryCredentialEntranceModule(),
             SettingLibraryDefaultSeatEntranceModule(),
+            SettingLibraryAppointmentEntranceModule(),
             Center(
               child: Text("设置完成后请在左上角刷新图书馆页面", style: TextStyle(color: Colors.grey)),
             )
