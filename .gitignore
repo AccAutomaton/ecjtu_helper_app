@@ -80,3 +80,4 @@ app.*.map.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
 /pubspec.lock
+/android/build/
