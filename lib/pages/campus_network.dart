@@ -128,7 +128,7 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
                                 size: 16,
                               ),
                               const Text(
-                                "即将过期",
+                                "建议重新登录",
                                 style: TextStyle(
                                     color: Colors.orange, fontSize: 12),
                               ),
