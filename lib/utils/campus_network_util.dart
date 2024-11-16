@@ -1,4 +1,8 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
+import 'package:ecjtu_helper/pages/campus_network.dart';
+import 'package:flutter/foundation.dart';
 import 'dio_util.dart';
 
 logout() async {
@@ -44,11 +48,59 @@ login(String? username, String? password, int? operator) async {
           method: "post",
           contentType: Headers.formUrlEncodedContentType,
         ));
-    if ((await dio.request("http://172.16.2.100/")).data.toString().contains("--Dr.COMWebLoginID_0.htm-->")) {
-      throw DioException(requestOptions: RequestOptions(), message: "请检查用户名或密码以及运营商是否填写正确");
+    if ((await dio.request("http://172.16.2.100/"))
+        .data
+        .toString()
+        .contains("--Dr.COMWebLoginID_0.htm-->")) {
+      throw DioException(
+          requestOptions: RequestOptions(), message: "请检查用户名或密码以及运营商是否填写正确");
     }
   } on DioException {
     rethrow;
+  }
+}
+
+Future<CampusNetworkUsageInformation> getUsageInformation() async {
+  if (kDebugMode) {
+    return CampusNetworkUsageInformation(
+        CampusNetworkConnectionStatus.values[Random().nextInt(3)],
+        Random().nextInt(60 * 24 * 4),
+        Random().nextInt(1024 * 1024 * 1024),
+        Random().nextInt(10000));
+  }
+
+  try {
+    String page = (await dio.request("http://172.16.2.100/")).data.toString();
+    if (page.contains("--Dr.COMWebLoginID_1.htm-->")) {
+      int time = 0, flux = 0, balance = 0;
+
+      int timeStart = page.indexOf("time");
+      page = page.substring(timeStart + 6);
+      int timeEnd = page.indexOf("'");
+      time = int.parse(page.substring(0, timeEnd).trim());
+
+      int fluxStart = page.indexOf("flow");
+      page = page.substring(fluxStart + 6);
+      int fluxEnd = page.indexOf("'");
+      flux = int.parse(page.substring(0, fluxEnd).trim());
+
+      int balanceStart = page.indexOf("fee");
+      page = page.substring(balanceStart + 5);
+      int balanceEnd = page.indexOf("'");
+      balance = int.parse(page.substring(0, balanceEnd).trim());
+
+      return CampusNetworkUsageInformation(
+          CampusNetworkConnectionStatus.isLogin, time, flux, balance);
+    } else if (page.contains("--Dr.COMWebLoginID_0.htm-->")) {
+      return CampusNetworkUsageInformation.onlyStatus(
+          CampusNetworkConnectionStatus.unLogin);
+    } else {
+      return CampusNetworkUsageInformation.onlyStatus(
+          CampusNetworkConnectionStatus.none);
+    }
+  } on DioException {
+    return CampusNetworkUsageInformation.onlyStatus(
+        CampusNetworkConnectionStatus.none);
   }
 }
 
