@@ -16,16 +16,13 @@ class _SettingLibraryAutoLoginSwitchModuleState
     extends State<SettingLibraryAutoLoginSwitchModule> {
   bool _enableAutoLogin = false;
 
-
   @override
   void initState() {
     super.initState();
-    readStringData("library_enableAutoLogin").then((data) =>
-        setState(() {
+    readStringData("library_enableAutoLogin").then((data) => setState(() {
           if (data != null) {
             _enableAutoLogin = bool.tryParse(data)!;
-          }
-          else {
+          } else {
             _enableAutoLogin = false;
           }
         }));
@@ -39,31 +36,30 @@ class _SettingLibraryAutoLoginSwitchModuleState
       trailing: Switch(
         value: _enableAutoLogin,
         onChanged: (value) async {
-          if (value == true && !(await hasCredential())) {
+          if (value == true && !(await _hasCredential())) {
             Fluttertoast.showToast(
-                msg: "请先填写图书馆登录凭据再开启此功能",
-                gravity: ToastGravity.CENTER);
+                msg: "请先填写图书馆登录凭据再开启此功能", gravity: ToastGravity.CENTER);
             return;
           }
           setState(() {
             _enableAutoLogin = value;
           });
           await saveStringData(
-          "library_enableAutoLogin", _enableAutoLogin.toString());
+              "library_enableAutoLogin", _enableAutoLogin.toString());
         },
       ),
     );
   }
-}
 
-Future<bool> hasCredential () async {
-  String? libraryUsername = await readStringData("library_username");
-  if (libraryUsername == null || libraryUsername.isEmpty) {
-    return false;
+  Future<bool> _hasCredential() async {
+    String? libraryUsername = await readStringData("library_username");
+    if (libraryUsername == null || libraryUsername.isEmpty) {
+      return false;
+    }
+    String? libraryPassword = await readStringData("library_password");
+    if (libraryPassword == null || libraryPassword.isEmpty) {
+      return false;
+    }
+    return true;
   }
-  String? libraryPassword = await readStringData("library_password");
-  if (libraryPassword == null || libraryPassword.isEmpty) {
-    return false;
-  }
-  return true;
 }

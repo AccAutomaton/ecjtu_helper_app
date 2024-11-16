@@ -25,17 +25,17 @@ class _DefaultStartPageSettingPageState
                 child:
                     Consumer(builder: (context, DefaultStartPageProvider provider, child) {
                   return ListView(children: [
-                    defaultStartPageOptionInkWell(
+                    _defaultStartPageOptionInkWell(
                         provider: provider,
                         startPage: StartPage.library,
                         icon: const Icon(Icons.collections_bookmark_outlined),
                         title: "图书馆"),
-                    defaultStartPageOptionInkWell(
+                    _defaultStartPageOptionInkWell(
                         provider: provider,
                         startPage: StartPage.campusNetwork,
                         icon: const Icon(Icons.wifi),
                         title: "校园网"),
-                    defaultStartPageOptionInkWell(
+                    _defaultStartPageOptionInkWell(
                         provider: provider,
                         startPage: StartPage.about,
                         icon: const Icon(Icons.info_outline),
@@ -43,26 +43,27 @@ class _DefaultStartPageSettingPageState
                   ]);
                 }))));
   }
-}
 
-InkWell defaultStartPageOptionInkWell(
-    {required DefaultStartPageProvider provider,
-    required StartPage startPage,
-    required Icon icon,
-    required String title}) {
-  return InkWell(
-    onTap: () async {
-      await provider.setStartPage(startPage);
-    },
-    child: ListTile(
-      leading: icon,
-      title: Text(title),
-      trailing: Checkbox(
-          value: provider.defaultStartPage == startPage,
-          activeColor: Colors.blue,
-          onChanged: (bool? value) async {
-            provider.setStartPage(startPage);
-          }),
-    ),
-  );
+  InkWell _defaultStartPageOptionInkWell(
+      {required DefaultStartPageProvider provider,
+        required StartPage startPage,
+        required Icon icon,
+        required String title}) {
+    return InkWell(
+      onTap: () async {
+        await provider.setStartPage(startPage);
+      },
+      child: ListTile(
+        leading: icon,
+        title: Text(title),
+        trailing: Checkbox(
+            value: provider.defaultStartPage == startPage,
+            activeColor: Colors.blue,
+            onChanged: (bool? value) async {
+              provider.setStartPage(startPage);
+            }),
+      ),
+    );
+  }
+
 }

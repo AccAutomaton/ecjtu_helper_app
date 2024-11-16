@@ -242,11 +242,11 @@ class _AboutPageState extends State<AboutPage> {
       ],
     );
   }
-}
 
-Future<String> _getAppAndBuildVersion() async {
-  PackageInfo info = await PackageInfo.fromPlatform();
-  return "${info.version} Build ${info.buildNumber}";
+  Future<String> _getAppAndBuildVersion() async {
+    PackageInfo info = await PackageInfo.fromPlatform();
+    return "${info.version} Build ${info.buildNumber}";
+  }
 }
 
 Future<(bool, String)> hasUpdate() async {

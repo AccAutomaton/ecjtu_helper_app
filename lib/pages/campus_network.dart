@@ -117,7 +117,7 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
                       children: [
                         Expanded(flex: 1, child: Container()),
                         const Text("已使用时间"),
-                        beautifullyMinute(_campusNetworkUsageInformation.time),
+                        _beautifullyMinute(_campusNetworkUsageInformation.time),
                         if (_campusNetworkUsageInformation.time >= 2760) ...[
                           Row(
                             children: [
@@ -148,7 +148,7 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
                       children: [
                         Expanded(flex: 1, child: Container()),
                         const Text("已使用流量"),
-                        beautifullyFlux(_campusNetworkUsageInformation.flux),
+                        _beautifullyFlux(_campusNetworkUsageInformation.flux),
                         Expanded(flex: 1, child: Container()),
                       ],
                     ),
@@ -185,7 +185,7 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
           action: (controller) async {
             HapticFeedback.lightImpact();
             controller.loading();
-            if (await onClickLoginButton()) {
+            if (await _onClickLoginButton()) {
               HapticFeedback.mediumImpact();
               controller.success();
               getUsageInformation().then((information) {
@@ -226,6 +226,103 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
           ),
         ));
   }
+
+  Widget _beautifullyMinute(int minute) {
+    return Row(
+      children: [
+        Expanded(flex: 1, child: Container()),
+        Text("${minute ~/ 60}", style: const TextStyle(fontSize: 24)),
+        const Text(" 小时 "),
+        Text("${minute % 60}", style: const TextStyle(fontSize: 24)),
+        const Text(" 分钟"),
+        Expanded(flex: 1, child: Container()),
+      ],
+    );
+  }
+
+  Widget _beautifullyFlux(int byte) {
+    return Row(
+      children: [
+        Expanded(flex: 1, child: Container()),
+        Text((byte / 1024 / 1024).toStringAsFixed(2),
+            style: const TextStyle(fontSize: 24)),
+        const Text(" GB"),
+        Expanded(flex: 1, child: Container()),
+      ],
+    );
+  }
+
+  Future<bool> _onClickLoginButton() async {
+    if (kDebugMode) {
+      await Future.delayed(const Duration(seconds: 3));
+      return Random().nextBool();
+    }
+
+    String? username = await readStringData("campus_network_username");
+    String? password = await readStringData("campus_network_password");
+    String? operator = await readStringData("campus_network_operator");
+    late int operatorSelected;
+
+    if (username == null || password == null || operator == null) {
+      Fluttertoast.showToast(
+          msg: "请先设置校园网登录凭据",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red);
+      return false;
+    }
+
+    if (username.isEmpty) {
+      Fluttertoast.showToast(
+          msg: "校园网(智慧交大)用户名不能为空",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red);
+      return false;
+    }
+    if (password.isEmpty) {
+      Fluttertoast.showToast(
+          msg: "校园网(智慧交大)密码不能为空",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red);
+      return false;
+    }
+    if (operator.isEmpty) {
+      Fluttertoast.showToast(
+          msg: "请选择运营商",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red);
+      return false;
+    } else {
+      operatorSelected = int.tryParse(operator)!;
+      if (!(operatorSelected >= 1 && operatorSelected <= 3)) {
+        Fluttertoast.showToast(
+            msg: "请选择运营商",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red);
+        return false;
+      }
+    }
+
+    try {
+      await logout();
+      await login(username, password, operatorSelected);
+    } on DioException catch (e) {
+      switch (e.type) {
+        case DioExceptionType.connectionTimeout:
+          Fluttertoast.showToast(
+              msg: "错误：连接超时。请检查是否正确连接到校园网。",
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.red);
+          break;
+        default:
+          Fluttertoast.showToast(
+              msg: "错误：$e",
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.red);
+      }
+      return false;
+    }
+    return true;
+  }
 }
 
 const List<DropdownMenuItem> operatorList = [
@@ -263,101 +360,4 @@ class CampusNetworkUsageInformation {
       this.status, this.time, this.flux, this.balance);
 
   CampusNetworkUsageInformation.onlyStatus(this.status);
-}
-
-Widget beautifullyMinute(int minute) {
-  return Row(
-    children: [
-      Expanded(flex: 1, child: Container()),
-      Text("${minute ~/ 60}", style: const TextStyle(fontSize: 24)),
-      const Text(" 小时 "),
-      Text("${minute % 60}", style: const TextStyle(fontSize: 24)),
-      const Text(" 分钟"),
-      Expanded(flex: 1, child: Container()),
-    ],
-  );
-}
-
-Widget beautifullyFlux(int byte) {
-  return Row(
-    children: [
-      Expanded(flex: 1, child: Container()),
-      Text((byte / 1024 / 1024).toStringAsFixed(2),
-          style: const TextStyle(fontSize: 24)),
-      const Text(" GB"),
-      Expanded(flex: 1, child: Container()),
-    ],
-  );
-}
-
-Future<bool> onClickLoginButton() async {
-  if (kDebugMode) {
-    await Future.delayed(const Duration(seconds: 3));
-    return Random().nextBool();
-  }
-
-  String? username = await readStringData("campus_network_username");
-  String? password = await readStringData("campus_network_password");
-  String? operator = await readStringData("campus_network_operator");
-  late int operatorSelected;
-
-  if (username == null || password == null || operator == null) {
-    Fluttertoast.showToast(
-        msg: "请先设置校园网登录凭据",
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red);
-    return false;
-  }
-
-  if (username.isEmpty) {
-    Fluttertoast.showToast(
-        msg: "校园网(智慧交大)用户名不能为空",
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red);
-    return false;
-  }
-  if (password.isEmpty) {
-    Fluttertoast.showToast(
-        msg: "校园网(智慧交大)密码不能为空",
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red);
-    return false;
-  }
-  if (operator.isEmpty) {
-    Fluttertoast.showToast(
-        msg: "请选择运营商",
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red);
-    return false;
-  } else {
-    operatorSelected = int.tryParse(operator)!;
-    if (!(operatorSelected >= 1 && operatorSelected <= 3)) {
-      Fluttertoast.showToast(
-          msg: "请选择运营商",
-          gravity: ToastGravity.CENTER,
-          backgroundColor: Colors.red);
-      return false;
-    }
-  }
-
-  try {
-    await logout();
-    await login(username, password, operatorSelected);
-  } on DioException catch (e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-        Fluttertoast.showToast(
-            msg: "错误：连接超时。请检查是否正确连接到校园网。",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.red);
-        break;
-      default:
-        Fluttertoast.showToast(
-            msg: "错误：$e",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.red);
-    }
-    return false;
-  }
-  return true;
 }

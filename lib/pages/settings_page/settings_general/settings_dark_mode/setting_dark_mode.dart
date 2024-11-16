@@ -29,17 +29,17 @@ class _DarkModeSettingState extends State<DarkModeSettingPage> {
                 child:
                     Consumer(builder: (context, ThemeProvider provider, child) {
                   return ListView(children: [
-                    darkModeOptionInkWell(
+                    _darkModeOptionInkWell(
                         provider: provider,
                         themeMode: ThemeMode.system,
                         icon: const Icon(Icons.brightness_auto),
                         title: "跟随系统"),
-                    darkModeOptionInkWell(
+                    _darkModeOptionInkWell(
                         provider: provider,
                         themeMode: ThemeMode.dark,
                         icon: const Icon(Icons.dark_mode),
                         title: "开启"),
-                    darkModeOptionInkWell(
+                    _darkModeOptionInkWell(
                         provider: provider,
                         themeMode: ThemeMode.light,
                         icon: const Icon(Icons.light_mode),
@@ -47,26 +47,26 @@ class _DarkModeSettingState extends State<DarkModeSettingPage> {
                   ]);
                 }))));
   }
-}
 
-InkWell darkModeOptionInkWell(
-    {required ThemeProvider provider,
-    required ThemeMode themeMode,
-    required Icon icon,
-    required String title}) {
-  return InkWell(
-    onTap: () async {
-      await provider.setThemeMode(themeMode);
-    },
-    child: ListTile(
-      leading: icon,
-      title: Text(title),
-      trailing: Checkbox(
-          value: provider.themeMode == themeMode,
-          activeColor: Colors.blue,
-          onChanged: (bool? value) async {
-            provider.setThemeMode(themeMode);
-          }),
-    ),
-  );
+  InkWell _darkModeOptionInkWell(
+      {required ThemeProvider provider,
+        required ThemeMode themeMode,
+        required Icon icon,
+        required String title}) {
+    return InkWell(
+      onTap: () async {
+        await provider.setThemeMode(themeMode);
+      },
+      child: ListTile(
+        leading: icon,
+        title: Text(title),
+        trailing: Checkbox(
+            value: provider.themeMode == themeMode,
+            activeColor: Colors.blue,
+            onChanged: (bool? value) async {
+              provider.setThemeMode(themeMode);
+            }),
+      ),
+    );
+  }
 }

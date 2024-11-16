@@ -28,29 +28,29 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
           widthFactor: 0.925,
           child: ListView(children: [
             lightGreyDivider,
-            settingLabel("通用"),
+            _settingLabel("通用"),
             const SettingDarkModeEntranceModule(),
             const SettingDefaultStartPageEntranceModule(),
             lightGreyDivider,
-            settingLabel("图书馆"),
+            _settingLabel("图书馆"),
             const SettingLibraryAutoLoginSwitchModule(),
             const SettingLibraryCredentialEntranceModule(),
             const SettingLibraryDefaultSeatEntranceModule(),
             const SettingLibraryAppointmentEntranceModule(),
             lightGreyDivider,
-            settingLabel("校园网"),
+            _settingLabel("校园网"),
             const SettingCampusNetworkCredentialEntranceModule(),
             lightGreyDivider,
           ]),
         )));
   }
-}
 
-Container settingLabel(String content) {
-  return Container(
-    margin: const EdgeInsetsDirectional.fromSTEB(15, 0, 0, 0),
-    child: Text(content, style: const TextStyle(color: Colors.grey)),
-  );
+  Container _settingLabel(String content) {
+    return Container(
+      margin: const EdgeInsetsDirectional.fromSTEB(15, 0, 0, 0),
+      child: Text(content, style: const TextStyle(color: Colors.grey)),
+    );
+  }
 }
 
 const lightGreyDivider = Divider(

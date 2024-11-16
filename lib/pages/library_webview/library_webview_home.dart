@@ -79,14 +79,14 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                 controller: _menuController,
                 consumeOutsideTap: true,
                 menuChildren: [
-                  buttonToPreviousPage(_menuController),
-                  buttonToRefresh(_menuController),
-                  buttonToClearRefresh(_menuController),
+                  _buttonToPreviousPage(),
+                  _buttonToRefresh(),
+                  _buttonToClearRefresh(),
                 ],
               ),
               actions: [
-                buttonToScanQRCode(),
-                buttonToLibrarySettings(context),
+                _buttonToScanQRCode(),
+                _buttonToLibrarySettings(),
               ],
             ),
             body: Column(
@@ -97,19 +97,273 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
                   child: Row(
                     children: [
                       Expanded(flex: 1, child: Container()),
-                      buttonToQuickAppointment(context),
+                      _buttonToQuickAppointment(),
                       Expanded(flex: 1, child: Container()),
-                      timeButton(_currentTime),
+                      _timeButton(_currentTime),
                       Expanded(flex: 1, child: Container()),
-                      buttonToQuickCheck(context),
+                      _buttonToQuickCheck(),
                       Expanded(flex: 1, child: Container()),
                     ],
                   ),
                 ),
                 Container(margin: const EdgeInsets.fromLTRB(0, 0, 0, 20)),
-                Expanded(flex: 20, child: webViewScope()),
+                Expanded(flex: 20, child: _webViewScope()),
               ],
             )));
+  }
+
+  Widget _buttonToPreviousPage() {
+    return ElevatedButton.icon(
+      icon: const Icon(Icons.keyboard_backspace),
+      label: const Text("上一页"),
+      style: menuChildrenButtonStyle,
+      onPressed: () {
+        libraryWebViewController.canGoBack().then((bool canGoBack) {
+          if (canGoBack) {
+            libraryWebViewController.goBack();
+          } else {
+            Fluttertoast.showToast(msg: "已经是第一页", gravity: ToastGravity.BOTTOM);
+          }
+          _menuController.close();
+        });
+      },
+    );
+  }
+
+  Widget _buttonToRefresh() {
+    return ElevatedButton.icon(
+      style: menuChildrenButtonStyle,
+      icon: const Icon(Icons.refresh),
+      label: const Text("刷新"),
+      onPressed: () {
+        libraryWebViewController.reload();
+        _menuController.close();
+      },
+    );
+  }
+
+  Widget _buttonToClearRefresh() {
+    return ElevatedButton.icon(
+      style: menuChildrenButtonStyle,
+      icon: const Icon(Icons.delete_forever_outlined),
+      label: const Text("清除数据并刷新"),
+      onPressed: () {
+        webViewCookieManager.removeCookie("lib2.ecjtu.edu.cn");
+        libraryWebViewController.clearCache();
+        libraryWebViewController.clearLocalStorage();
+        libraryWebViewController.reload();
+        _menuController.close();
+      },
+    );
+  }
+
+  Widget _buttonToScanQRCode() {
+    return IconButton(
+      icon: const Icon(Icons.qr_code_scanner),
+      onPressed: () async {
+        if (await isLibraryLogin()) {
+          ScanResult? scanResult = await FlutterHmsScanKit.startScan();
+          String? to = "http://lib2.ecjtu.edu.cn/";
+          to = scanResult?.value;
+          libraryWebViewController.loadRequest(Uri.parse(to!));
+        } else {
+          Fluttertoast.showToast(
+              msg: "请先登录图书馆再扫码",
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.yellow[800]);
+        }
+      },
+    );
+  }
+
+  Widget _buttonToLibrarySettings() {
+    return IconButton(
+      icon: const Icon(Icons.settings_outlined),
+      onPressed: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) {
+            return const LibrarySettingsPage();
+          }),
+        );
+      },
+    );
+  }
+
+  Widget _buttonToQuickAppointment() {
+    return ElevatedButton.icon(
+      icon: const Icon(Icons.fast_forward_outlined),
+      label: const Text("快速预约"),
+      onPressed: () {
+        isLibraryLogin().then((isLogin) {
+          if (isLogin) {
+            doQuickAppointment().then((appointmentResultList) {
+              if (appointmentResultList != null) {
+                _showAppointmentResultDialog(appointmentResultList);
+              }
+            });
+          } else {
+            Fluttertoast.showToast(
+                msg: "请先登录图书馆再预约",
+                gravity: ToastGravity.CENTER,
+                backgroundColor: Colors.yellow[800]);
+          }
+        });
+      },
+      onLongPress: () async {
+        readStringData("library_has_default_room_dev_id")
+            .then((hasDefaultSeat) async {
+          if (hasDefaultSeat != null) {
+            if (bool.parse(hasDefaultSeat)) {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (BuildContext context) {
+                  return const SettingLibraryAppointmentPage();
+                }),
+              );
+              return;
+            }
+          }
+          Fluttertoast.showToast(
+              msg: "请先设置默认座位再使用快速预约功能", gravity: ToastGravity.BOTTOM);
+        });
+      },
+    );
+  }
+
+  Widget _timeButton(DateTime currentTime) {
+    return ElevatedButton.icon(
+      icon: const Icon(Icons.access_time),
+      label: Text(
+          "  ${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}:${currentTime.second.toString().padLeft(2, '0')}  "),
+      onPressed: () {},
+    );
+  }
+
+  Widget _buttonToQuickCheck() {
+    return ElevatedButton.icon(
+      icon: const Icon(Icons.fact_check_outlined),
+      label: const Text("快速签到"),
+      onPressed: () async {
+        if (await isLibraryLogin()) {
+          bool hasDefaultSeat = false;
+          readStringData("library_has_default_room_dev_id")
+              .then((isHasDefaultSeat) {
+            if (isHasDefaultSeat != null) {
+              hasDefaultSeat = bool.parse(isHasDefaultSeat);
+              if (hasDefaultSeat) {
+                readStringData("library_default_room_dev_id").then((roomDevId) {
+                  libraryWebViewController.loadRequest(Uri.parse(
+                      "http://update.unifound.net/wxnotice/s.aspx?c=$roomDevId"));
+                });
+                return;
+              }
+            }
+            Fluttertoast.showToast(
+                msg: "尚未设置默认座位，请长按该按钮进行设置。", gravity: ToastGravity.CENTER);
+          });
+        } else {
+          Fluttertoast.showToast(
+              msg: "请先登录图书馆再签到",
+              gravity: ToastGravity.CENTER,
+              backgroundColor: Colors.yellow[800]);
+        }
+      },
+      onLongPress: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) {
+            return const SettingLibraryDefaultSeatPage();
+          }),
+        );
+      },
+    );
+  }
+
+  Widget _webViewScope() {
+    return PopScope(
+      canPop: false,
+      child: WebViewWidget(controller: libraryWebViewController),
+      onPopInvoked: (didPop) {
+        libraryWebViewController.canGoBack().then((bool canGoBack) {
+          if (canGoBack) {
+            libraryWebViewController.goBack();
+          } else {
+            Fluttertoast.showToast(msg: "已经是第一页", gravity: ToastGravity.BOTTOM);
+          }
+        });
+      },
+    );
+  }
+
+  _showAppointmentResultDialog(List<AppointmentResult> appointmentResultList) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Center(
+              child: Row(
+                children: [
+                  Expanded(flex: 1, child: Container()),
+                  const Icon(Icons.fact_check_outlined),
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    child: const Text("预约结果"),
+                  ),
+                  Expanded(flex: 1, child: Container()),
+                ],
+              ),
+            ),
+            content: SizedBox(
+              height: appointmentResultList.length * 78,
+              child: Column(
+                children: appointmentResultWidgetList(appointmentResultList),
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('确认'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  List<Widget> appointmentResultWidgetList(
+      List<AppointmentResult> appointmentResultList) {
+    List<Widget> widgetList = [];
+    for (int i = 0; i < appointmentResultList.length; i++) {
+      widgetList.add(Row(
+        children: [
+          Expanded(flex: 1, child: Container()),
+          Column(
+            children: [
+              Text("预约时段 ${appointmentResultList[i].number}",
+                  style: const TextStyle(color: Colors.grey)),
+              Text(appointmentResultList[i].timeScale),
+              if (appointmentResultList[i].result == "新增成功") ...[
+                const Text("预约成功",
+                    style: TextStyle(
+                        color: Colors.green, fontWeight: FontWeight.w800)),
+              ] else ...[
+                Text(appointmentResultList[i].result,
+                    style: const TextStyle(
+                        color: Colors.red, fontWeight: FontWeight.w800)),
+              ],
+              const SizedBox(
+                width: 300,
+                child: Divider(),
+              )
+            ],
+          ),
+          Expanded(flex: 1, child: Container()),
+        ],
+      ));
+    }
+    return widgetList;
   }
 }
 
@@ -118,192 +372,6 @@ ButtonStyle menuChildrenButtonStyle = ButtonStyle(
   shadowColor: WidgetStateProperty.all(Colors.transparent),
   minimumSize: const WidgetStatePropertyAll(Size(175, 50)),
 );
-
-Widget buttonToPreviousPage(MenuController menuController) {
-  return ElevatedButton.icon(
-    icon: const Icon(Icons.keyboard_backspace),
-    label: const Text("上一页"),
-    style: menuChildrenButtonStyle,
-    onPressed: () {
-      libraryWebViewController.canGoBack().then((bool canGoBack) {
-        if (canGoBack) {
-          libraryWebViewController.goBack();
-        } else {
-          Fluttertoast.showToast(msg: "已经是第一页", gravity: ToastGravity.BOTTOM);
-        }
-        menuController.close();
-      });
-    },
-  );
-}
-
-Widget buttonToRefresh(MenuController menuController) {
-  return ElevatedButton.icon(
-    style: menuChildrenButtonStyle,
-    icon: const Icon(Icons.refresh),
-    label: const Text("刷新"),
-    onPressed: () {
-      libraryWebViewController.reload();
-      menuController.close();
-    },
-  );
-}
-
-Widget buttonToClearRefresh(MenuController menuController) {
-  return ElevatedButton.icon(
-    style: menuChildrenButtonStyle,
-    icon: const Icon(Icons.delete_forever_outlined),
-    label: const Text("清除数据并刷新"),
-    onPressed: () {
-      webViewCookieManager.removeCookie("lib2.ecjtu.edu.cn");
-      libraryWebViewController.clearCache();
-      libraryWebViewController.clearLocalStorage();
-      libraryWebViewController.reload();
-      menuController.close();
-    },
-  );
-}
-
-Widget buttonToScanQRCode() {
-  return IconButton(
-    icon: const Icon(Icons.qr_code_scanner),
-    onPressed: () async {
-      if (await isLibraryLogin()) {
-        ScanResult? scanResult = await FlutterHmsScanKit.startScan();
-        String? to = "http://lib2.ecjtu.edu.cn/";
-        to = scanResult?.value;
-        libraryWebViewController.loadRequest(Uri.parse(to!));
-      } else {
-        Fluttertoast.showToast(
-            msg: "请先登录图书馆再扫码",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.yellow[800]);
-      }
-    },
-  );
-}
-
-Widget buttonToLibrarySettings(BuildContext context) {
-  return IconButton(
-    icon: const Icon(Icons.settings_outlined),
-    onPressed: () async {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (BuildContext context) {
-          return const LibrarySettingsPage();
-        }),
-      );
-    },
-  );
-}
-
-Widget buttonToQuickAppointment(BuildContext context) {
-  return ElevatedButton.icon(
-    icon: const Icon(Icons.fast_forward_outlined),
-    label: const Text("快速预约"),
-    onPressed: () {
-      isLibraryLogin().then((isLogin) {
-        if (isLogin) {
-          doQuickAppointment().then((appointmentResultList) {
-            if (appointmentResultList != null) {
-              showAppointmentResultDialog(appointmentResultList, context);
-            }
-          });
-        } else {
-          Fluttertoast.showToast(
-              msg: "请先登录图书馆再预约",
-              gravity: ToastGravity.CENTER,
-              backgroundColor: Colors.yellow[800]);
-        }
-      });
-    },
-    onLongPress: () async {
-      readStringData("library_has_default_room_dev_id")
-          .then((hasDefaultSeat) async {
-        if (hasDefaultSeat != null) {
-          if (bool.parse(hasDefaultSeat)) {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (BuildContext context) {
-                return const SettingLibraryAppointmentPage();
-              }),
-            );
-            return;
-          }
-        }
-        Fluttertoast.showToast(
-            msg: "请先设置默认座位再使用快速预约功能", gravity: ToastGravity.BOTTOM);
-      });
-    },
-  );
-}
-
-Widget timeButton(DateTime currentTime) {
-  return ElevatedButton.icon(
-    icon: const Icon(Icons.access_time),
-    label: Text(
-        "  ${currentTime.hour}:${currentTime.minute.toString().padLeft(2, '0')}:${currentTime.second.toString().padLeft(2, '0')}  "),
-    onPressed: () {},
-  );
-}
-
-Widget buttonToQuickCheck(
-  BuildContext context,
-) {
-  return ElevatedButton.icon(
-    icon: const Icon(Icons.fact_check_outlined),
-    label: const Text("快速签到"),
-    onPressed: () async {
-      if (await isLibraryLogin()) {
-        bool hasDefaultSeat = false;
-        readStringData("library_has_default_room_dev_id")
-            .then((isHasDefaultSeat) {
-          if (isHasDefaultSeat != null) {
-            hasDefaultSeat = bool.parse(isHasDefaultSeat);
-            if (hasDefaultSeat) {
-              readStringData("library_default_room_dev_id").then((roomDevId) {
-                libraryWebViewController.loadRequest(Uri.parse(
-                    "http://update.unifound.net/wxnotice/s.aspx?c=$roomDevId"));
-              });
-              return;
-            }
-          }
-          Fluttertoast.showToast(
-              msg: "尚未设置默认座位，请长按该按钮进行设置。", gravity: ToastGravity.CENTER);
-        });
-      } else {
-        Fluttertoast.showToast(
-            msg: "请先登录图书馆再签到",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.yellow[800]);
-      }
-    },
-    onLongPress: () async {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (BuildContext context) {
-          return const SettingLibraryDefaultSeatPage();
-        }),
-      );
-    },
-  );
-}
-
-Widget webViewScope() {
-  return PopScope(
-    canPop: false,
-    child: WebViewWidget(controller: libraryWebViewController),
-    onPopInvoked: (didPop) {
-      libraryWebViewController.canGoBack().then((bool canGoBack) {
-        if (canGoBack) {
-          libraryWebViewController.goBack();
-        } else {
-          Fluttertoast.showToast(msg: "已经是第一页", gravity: ToastGravity.BOTTOM);
-        }
-      });
-    },
-  );
-}
 
 final WebViewController libraryWebViewController = WebViewController()
   ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -503,77 +571,6 @@ Future<List<AppointmentResult>?> doQuickAppointment() async {
         msg: "网络异常: Dio Exception", gravity: ToastGravity.BOTTOM);
   }
   return null;
-}
-
-showAppointmentResultDialog(
-    List<AppointmentResult> appointmentResultList, BuildContext context) {
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Center(
-            child: Row(
-              children: [
-                Expanded(flex: 1, child: Container()),
-                const Icon(Icons.fact_check_outlined),
-                Container(
-                  margin: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                  child: const Text("预约结果"),
-                ),
-                Expanded(flex: 1, child: Container()),
-              ],
-            ),
-          ),
-          content: SizedBox(
-            height: appointmentResultList.length * 78,
-            child: Column(
-              children: appointmentResultWidgetList(appointmentResultList),
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text('确认'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      });
-}
-
-List<Widget> appointmentResultWidgetList(
-    List<AppointmentResult> appointmentResultList) {
-  List<Widget> widgetList = [];
-  for (int i = 0; i < appointmentResultList.length; i++) {
-    widgetList.add(Row(
-      children: [
-        Expanded(flex: 1, child: Container()),
-        Column(
-          children: [
-            Text("预约时段 ${appointmentResultList[i].number}",
-                style: const TextStyle(color: Colors.grey)),
-            Text(appointmentResultList[i].timeScale),
-            if (appointmentResultList[i].result == "新增成功") ...[
-              const Text("预约成功",
-                  style: TextStyle(
-                      color: Colors.green, fontWeight: FontWeight.w800)),
-            ] else ...[
-              Text(appointmentResultList[i].result,
-                  style: const TextStyle(
-                      color: Colors.red, fontWeight: FontWeight.w800)),
-            ],
-            const SizedBox(
-              width: 300,
-              child: Divider(),
-            )
-          ],
-        ),
-        Expanded(flex: 1, child: Container()),
-      ],
-    ));
-  }
-  return widgetList;
 }
 
 class AppointmentResult {

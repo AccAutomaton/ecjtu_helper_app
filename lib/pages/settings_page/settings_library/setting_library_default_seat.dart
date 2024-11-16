@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hms_scan_kit/flutter_hms_scan_kit.dart';
 import 'package:flutter_hms_scan_kit/scan_result.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../../utils/library_json_util.dart';
 import '../../../utils/shared_preferences_util.dart';
 import '../settings_home.dart';
 
@@ -59,7 +57,7 @@ class _SettingLibraryDefaultSeatPage
                 Column(
                   children: [
                     if (_hasDefaultSeat) ...[
-                      defaultSeatFutureBuilder(_defaultSeat!),
+                      _defaultSeatFutureBuilder(_defaultSeat!),
                     ] else ...[
                       const Text("当前默认座位",
                           style: TextStyle(color: Colors.grey)),
@@ -104,37 +102,19 @@ class _SettingLibraryDefaultSeatPage
       ),
     );
   }
-}
 
-Future<(String labName, String roomName, String devName)> getDetailInformation(
-    String queryParamC) async {
-  List<String> stringList = queryParamC.split("_");
-  String? labId = stringList[0];
-  String? devId = stringList[2];
-  String labName = "", roomName = "", devName = "";
-  List devList = jsonDecode(
-      await rootBundle.loadString('jsons/library/labId_$labId.json'));
-  for (int i = 0; i < devList.length; i++) {
-    if (devList[i]["devId"].toString() == devId) {
-      labName = devList[i]["labName"].toString();
-      roomName = devList[i]["roomName"].toString();
-      devName = devList[i]["devName"].toString();
-    }
+  Widget _defaultSeatFutureBuilder(String defaultSeat) {
+    return FutureBuilder(
+        future: getDetailInformation(defaultSeat),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return defaultSeatWidget(
+                snapshot.data.$1, snapshot.data.$2, snapshot.data.$3);
+          } else {
+            return const Text("加载中");
+          }
+        });
   }
-  return (labName, roomName, devName);
-}
-
-Widget defaultSeatFutureBuilder(String defaultSeat) {
-  return FutureBuilder(
-      future: getDetailInformation(defaultSeat),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return defaultSeatWidget(
-              snapshot.data.$1, snapshot.data.$2, snapshot.data.$3);
-        } else {
-          return const Text("加载中");
-        }
-      });
 }
 
 Widget defaultSeatWidget(String labName, String roomName, String devName) {

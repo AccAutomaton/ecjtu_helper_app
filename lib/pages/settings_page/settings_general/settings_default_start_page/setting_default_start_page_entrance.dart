@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../../../provider/default_start_page_provider.dart';
 
-
 class SettingDefaultStartPageEntranceModule extends StatefulWidget {
   const SettingDefaultStartPageEntranceModule({super.key});
 
@@ -13,13 +12,14 @@ class SettingDefaultStartPageEntranceModule extends StatefulWidget {
   State<StatefulWidget> createState() {
     return _SettingDefaultStartPageEntranceModuleState();
   }
-
 }
 
-class _SettingDefaultStartPageEntranceModuleState extends State<SettingDefaultStartPageEntranceModule> {
+class _SettingDefaultStartPageEntranceModuleState
+    extends State<SettingDefaultStartPageEntranceModule> {
   @override
   Widget build(BuildContext context) {
-    return Consumer(builder: (context, DefaultStartPageProvider provider, child) {
+    return Consumer(
+        builder: (context, DefaultStartPageProvider provider, child) {
       return InkWell(
         onTap: () async {
           await Navigator.push(
@@ -29,15 +29,12 @@ class _SettingDefaultStartPageEntranceModuleState extends State<SettingDefaultSt
             }),
           );
         },
-        // ignore: prefer_const_constructors
-        child: ListTile(
-          leading: const Icon(Icons.home_outlined),
-          title: const Text("启动APP时默认展示的界面"),
-          // subtitle: Text(provider.defaultStartPage.name),
-          trailing: const Icon(Icons.arrow_forward_ios),
+        child: const ListTile(
+          leading: Icon(Icons.home_outlined),
+          title: Text("启动APP时默认展示的界面"),
+          trailing: Icon(Icons.arrow_forward_ios),
         ),
       );
     });
   }
-
 }
