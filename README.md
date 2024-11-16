@@ -1,16 +1,21 @@
 # ecjtu_helper
 
-A good helper for ECJTUers.
+### 功能
 
-## Getting Started
+- 图书馆
+  - [x] 进入预约系统时自动填充密码并登录
+  - [x] 一键预约
+  - [x] 快速签到
+  - [x] 扫码预约
+  - [x] 扫码签到
+- 校园网
+  - [x] 一键登录/刷新过期时间
 
-This project is a starting point for a Flutter application.
+### 开发者指南
 
-A few resources to get you started if this is your first Flutter project:
+**开发环境**
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Android Studio Koala Feature Drop | `2024.1.2 Patch 1` (JDK 17) 
+- flutter `3.22.3`
+- Android SDK `35.0.0`
+- gradle `7.6.3`
