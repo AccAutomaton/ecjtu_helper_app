@@ -193,7 +193,7 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
   Widget _buttonToQuickAppointment() {
     return ElevatedButton.icon(
       icon: const Icon(Icons.fast_forward_outlined),
-      label: const Text("快速预约"),
+      label: const Text("一键预约"),
       onPressed: () {
         isLibraryLogin().then((isLogin) {
           if (isLogin) {
