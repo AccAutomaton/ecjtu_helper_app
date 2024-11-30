@@ -118,7 +118,7 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
                         Expanded(flex: 1, child: Container()),
                         const Text("已使用时间"),
                         _beautifullyMinute(_campusNetworkUsageInformation.time),
-                        if (_campusNetworkUsageInformation.time >= 2760) ...[
+                        if (_campusNetworkUsageInformation.time >= 2460) ...[
                           Row(
                             children: [
                               Expanded(flex: 1, child: Container()),
@@ -128,7 +128,7 @@ class _CampusNetworkPageState extends State<CampusNetworkPage> {
                                 size: 16,
                               ),
                               const Text(
-                                "建议重新登录",
+                                "将于 6 小时内过期",
                                 style: TextStyle(
                                     color: Colors.orange, fontSize: 12),
                               ),
