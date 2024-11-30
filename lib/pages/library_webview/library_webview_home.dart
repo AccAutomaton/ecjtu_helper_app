@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:ecjtu_helper/main.dart';
 import 'package:ecjtu_helper/pages/library_webview/library_settings.dart';
 import 'package:ecjtu_helper/pages/settings_page/settings_library/setting_library_default_seat.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class LibraryWebviewPage extends StatefulWidget {
   }
 }
 
-class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
+class _LibraryWebviewPageState extends State<LibraryWebviewPage> with WidgetsBindingObserver {
   late Timer _timer;
   DateTime _currentTime = DateTime.now();
   final MenuController _menuController = MenuController();
@@ -43,6 +44,20 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> {
   void dispose() {
     _timer.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    super.didChangePlatformBrightness();
+    if (MediaQuery.platformBrightnessOf(context) == Brightness.dark) {
+      libraryWebViewController.runJavaScript(
+          'document.querySelector("html").style.filter = "invert(1) contrast(0.95) saturate(0.5) hue-rotate(180deg)";'
+      );
+    } else {
+      libraryWebViewController.runJavaScript(
+          'document.querySelector("html").style.filter = "invert(0)";'
+      );
+    }
   }
 
   void setCurrentTime(Timer timer) {
@@ -378,6 +393,15 @@ final WebViewController libraryWebViewController = WebViewController()
   ..setUserAgent(
       "Mozilla/5.0 (Linux; Android 6.0.1; MX4 Build/MOB30M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.106 Mobile Safari/537.36")
   ..setNavigationDelegate(NavigationDelegate(onPageStarted: (String url) {
+    if (MediaQuery.platformBrightnessOf(navigatorKey.currentState!.overlay!.context) == Brightness.dark) {
+      libraryWebViewController.runJavaScript(
+          'document.querySelector("html").style.filter = "invert(1) contrast(0.95) saturate(0.5) hue-rotate(180deg)";'
+      );
+    } else {
+      libraryWebViewController.runJavaScript(
+          'document.querySelector("html").style.filter = "invert(0)";'
+      );
+    }
     EasyLoading.instance.indicatorType = EasyLoadingIndicatorType.circle;
     EasyLoading.show(status: "正在加载...");
   }, onPageFinished: (String url) async {

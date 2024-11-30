@@ -15,6 +15,8 @@ void main() {
   ], child: const MainNavBarPage()));
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class MainNavBarPage extends StatefulWidget {
   const MainNavBarPage({super.key});
 
@@ -52,6 +54,7 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ThemeProvider provider, child) {
       return MaterialApp(
+          navigatorKey: navigatorKey,
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
           themeMode: provider.themeMode,
