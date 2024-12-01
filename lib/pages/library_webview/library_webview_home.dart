@@ -6,11 +6,13 @@ import 'package:dio/dio.dart';
 import 'package:ecjtu_helper/main.dart';
 import 'package:ecjtu_helper/pages/library_webview/library_settings.dart';
 import 'package:ecjtu_helper/pages/settings_page/settings_library/setting_library_default_seat.dart';
+import 'package:ecjtu_helper/provider/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hms_scan_kit/flutter_hms_scan_kit.dart';
 import 'package:flutter_hms_scan_kit/scan_result.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -38,25 +40,20 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> with WidgetsBin
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 1), setCurrentTime);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     _timer.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
-  void didChangePlatformBrightness() {
-    super.didChangePlatformBrightness();
-    if (MediaQuery.platformBrightnessOf(context) == Brightness.dark) {
-      libraryWebViewController.runJavaScript(
-          'document.querySelector("html").style.filter = "invert(1) contrast(0.95) saturate(0.5) hue-rotate(180deg)";'
-      );
-    } else {
-      libraryWebViewController.runJavaScript(
-          'document.querySelector("html").style.filter = "invert(0)";'
-      );
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      checkBrightness(context);
     }
   }
 
@@ -84,6 +81,9 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> with WidgetsBin
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ThemeProvider>(context).addListener(() {
+      checkBrightness(context);
+    });
     return FlutterEasyLoading(
         child: Scaffold(
             appBar: AppBar(
@@ -388,23 +388,34 @@ ButtonStyle menuChildrenButtonStyle = ButtonStyle(
   minimumSize: const WidgetStatePropertyAll(Size(175, 50)),
 );
 
+doWebViewForceTheme() {
+  checkBrightness(navigatorKey.currentState!.overlay!.context);
+}
+
+checkBrightness(BuildContext context) {
+  ThemeMode currentThemeMode = Provider.of<ThemeProvider>(context, listen: false).themeMode;
+  Brightness brightness = MediaQuery.of(context).platformBrightness;
+  if ((brightness == Brightness.dark && currentThemeMode == ThemeMode.system) || currentThemeMode == ThemeMode.dark) {
+    libraryWebViewController.runJavaScript(
+        'document.querySelector("html").style.filter = "invert(1) contrast(0.95) saturate(0.5) hue-rotate(180deg)";'
+    );
+  } else {
+    libraryWebViewController.runJavaScript(
+        'document.querySelector("html").style.filter = "invert(0)";'
+    );
+  }
+}
+
 final WebViewController libraryWebViewController = WebViewController()
   ..setJavaScriptMode(JavaScriptMode.unrestricted)
   ..setUserAgent(
       "Mozilla/5.0 (Linux; Android 6.0.1; MX4 Build/MOB30M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.106 Mobile Safari/537.36")
   ..setNavigationDelegate(NavigationDelegate(onPageStarted: (String url) {
-    if (MediaQuery.platformBrightnessOf(navigatorKey.currentState!.overlay!.context) == Brightness.dark) {
-      libraryWebViewController.runJavaScript(
-          'document.querySelector("html").style.filter = "invert(1) contrast(0.95) saturate(0.5) hue-rotate(180deg)";'
-      );
-    } else {
-      libraryWebViewController.runJavaScript(
-          'document.querySelector("html").style.filter = "invert(0)";'
-      );
-    }
+    doWebViewForceTheme();
     EasyLoading.instance.indicatorType = EasyLoadingIndicatorType.circle;
     EasyLoading.show(status: "正在加载...");
   }, onPageFinished: (String url) async {
+    doWebViewForceTheme();
     EasyLoading.dismiss();
     bool enableAutoLogin = false;
     await readStringData("library_enableAutoLogin").then((data) {
@@ -438,9 +449,11 @@ final WebViewController libraryWebViewController = WebViewController()
       }
     }
   }, onWebResourceError: (WebResourceError error) {
+    doWebViewForceTheme();
     EasyLoading.dismiss();
     Fluttertoast.showToast(msg: "网页开小差了...", gravity: ToastGravity.BOTTOM);
   }, onHttpError: (HttpResponseError error) {
+    doWebViewForceTheme();
     EasyLoading.dismiss();
   }))
   ..loadRequest(Uri.parse("http://lib2.ecjtu.edu.cn/"));
