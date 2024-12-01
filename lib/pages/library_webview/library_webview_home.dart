@@ -31,7 +31,8 @@ class LibraryWebviewPage extends StatefulWidget {
   }
 }
 
-class _LibraryWebviewPageState extends State<LibraryWebviewPage> with WidgetsBindingObserver {
+class _LibraryWebviewPageState extends State<LibraryWebviewPage>
+    with WidgetsBindingObserver {
   late Timer _timer;
   DateTime _currentTime = DateTime.now();
   final MenuController _menuController = MenuController();
@@ -330,8 +331,8 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> with WidgetsBin
               ),
             ),
             content: SizedBox(
-              height: appointmentResultList.length * 78,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: appointmentResultWidgetList(appointmentResultList),
               ),
             ),
@@ -364,9 +365,16 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> with WidgetsBin
                     style: TextStyle(
                         color: Colors.green, fontWeight: FontWeight.w800)),
               ] else ...[
-                Text(appointmentResultList[i].result,
+                SizedBox(
+                  width: 250,
+                  child: Text(
+                    appointmentResultList[i].result,
                     style: const TextStyle(
-                        color: Colors.red, fontWeight: FontWeight.w800)),
+                        color: Colors.red, fontWeight: FontWeight.w800),
+                    softWrap: true,
+                    textAlign: TextAlign.center,
+                  ),
+                )
               ],
               const SizedBox(
                 width: 250,
@@ -393,16 +401,16 @@ doWebViewForceTheme() {
 }
 
 checkBrightness(BuildContext context) {
-  ThemeMode currentThemeMode = Provider.of<ThemeProvider>(context, listen: false).themeMode;
+  ThemeMode currentThemeMode =
+      Provider.of<ThemeProvider>(context, listen: false).themeMode;
   Brightness brightness = MediaQuery.of(context).platformBrightness;
-  if ((brightness == Brightness.dark && currentThemeMode == ThemeMode.system) || currentThemeMode == ThemeMode.dark) {
+  if ((brightness == Brightness.dark && currentThemeMode == ThemeMode.system) ||
+      currentThemeMode == ThemeMode.dark) {
     libraryWebViewController.runJavaScript(
-        'document.querySelector("html").style.filter = "invert(1) contrast(0.95) saturate(0.5) hue-rotate(180deg)";'
-    );
+        'document.querySelector("html").style.filter = "invert(1) contrast(0.95) saturate(0.5) hue-rotate(180deg)";');
   } else {
     libraryWebViewController.runJavaScript(
-        'document.querySelector("html").style.filter = "invert(0)";'
-    );
+        'document.querySelector("html").style.filter = "invert(0)";');
   }
 }
 
@@ -593,8 +601,10 @@ Future<List<AppointmentResult>?> doQuickAppointment() async {
                 .toString();
             var appointmentData = jsonDecode(appointmentJson);
 
-            appointmentResultList.add(AppointmentResult(i,
-                "${resvBeginTime.substring(0, resvBeginTime.length - 3)} ~ ${resvEndTime.substring(0, resvEndTime.length - 3)}", appointmentData["message"]));
+            appointmentResultList.add(AppointmentResult(
+                i,
+                "${resvBeginTime.substring(0, resvBeginTime.length - 3)} ~ ${resvEndTime.substring(0, resvEndTime.length - 3)}",
+                appointmentData["message"]));
           } on DioException {
             appointmentResultList.add(AppointmentResult(
                 i, "$resvBeginTime ~ $resvEndTime", "预约失败: Dio Exception"));
