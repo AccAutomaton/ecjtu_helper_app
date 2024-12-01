@@ -369,7 +369,7 @@ class _LibraryWebviewPageState extends State<LibraryWebviewPage> with WidgetsBin
                         color: Colors.red, fontWeight: FontWeight.w800)),
               ],
               const SizedBox(
-                width: 300,
+                width: 250,
                 child: Divider(),
               )
             ],
@@ -594,7 +594,7 @@ Future<List<AppointmentResult>?> doQuickAppointment() async {
             var appointmentData = jsonDecode(appointmentJson);
 
             appointmentResultList.add(AppointmentResult(i,
-                "$resvBeginTime ~ $resvEndTime", appointmentData["message"]));
+                "${resvBeginTime.substring(0, resvBeginTime.length - 3)} ~ ${resvEndTime.substring(0, resvEndTime.length - 3)}", appointmentData["message"]));
           } on DioException {
             appointmentResultList.add(AppointmentResult(
                 i, "$resvBeginTime ~ $resvEndTime", "预约失败: Dio Exception"));
