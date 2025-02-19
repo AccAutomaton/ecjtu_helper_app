@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.1.9+241201
+version: 0.2.0+250219
 
 environment:
   sdk: '>=3.4.4 <4.0.0'
@@ -39,20 +39,23 @@ dependencies:
   flutter_screenutil: ^5.9.0-beta
   dio: ^5.3.4
 #  oktoast: ^3.3.1
-  package_info_plus: ^4.0.2
+  package_info_plus: ^8.2.1
 #  device_info_plus: ^8.1.0
-  permission_handler: ^10.2.0
+  permission_handler: ^11.3.1
   url_launcher: ^6.1.6
 #  flutter_html: ^3.0.0-alpha.6
   shared_preferences: ^2.0.15
-  fluttertoast: ^8.2.8
+  fluttertoast: ^8.2.12
   webview_flutter: ^4.8.0
   flutter_hms_scan_kit: ^1.1.4
   flutter_markdown: ^0.7.3+2
   lazy_load_indexed_stack: ^1.1.0
   flutter_easyloading: ^3.0.5
   action_slider: ^0.7.0
-  webview_cookie_manager: ^2.0.6
+  webview_cookie_manager:
+    git:
+      url: https://github.com/fryette/webview_cookie_manager
+      ref: 8572dd54c437c919aedc8dca6c5bffd25fe74b3c
 #  sqflite: ^2.3.3+1
 
 dev_dependencies:
