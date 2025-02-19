@@ -15,7 +15,7 @@
 
 **开发环境**
 
-- Android Studio Koala Feature Drop | `2024.1.2 Patch 1` (JDK 17) 
-- flutter `3.22.3`
-- Android SDK `35.0.0`
-- gradle `7.6.3`
+- Android Studio Koala Feature Drop | `2024.2.2 Patch 1` (JDK 21) 
+- flutter `3.29.0`
+- Android SDK Platform Version `35`
+- gradle `8.9.0`
