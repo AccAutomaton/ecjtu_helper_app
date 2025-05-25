@@ -1,3 +1,14 @@
+### v1.0.0
+
+- 调整
+  - 学校图书馆已更换预约系统，故将预约功能下架。老登已毕业，欢迎有志之士接手开发。
+  - 更新服务器移至 Github，检查更新时请确认能正常访问 github.com 。
+  - 您可移步
+    
+    [https://github.com/AccAutomaton/ecjtu_helper_app/releases](https://github.com/AccAutomaton/ecjtu_helper_app/releases)
+    
+    查看更多有关信息。
+
 ### v0.2.0
 
 - 优化

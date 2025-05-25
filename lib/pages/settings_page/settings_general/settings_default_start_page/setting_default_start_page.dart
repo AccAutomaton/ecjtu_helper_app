@@ -25,11 +25,11 @@ class _DefaultStartPageSettingPageState
                 child:
                     Consumer(builder: (context, DefaultStartPageProvider provider, child) {
                   return ListView(children: [
-                    _defaultStartPageOptionInkWell(
-                        provider: provider,
-                        startPage: StartPage.library,
-                        icon: const Icon(Icons.collections_bookmark_outlined),
-                        title: "图书馆"),
+                    // _defaultStartPageOptionInkWell(
+                    //     provider: provider,
+                    //     startPage: StartPage.library,
+                    //     icon: const Icon(Icons.collections_bookmark_outlined),
+                    //     title: "图书馆"),
                     _defaultStartPageOptionInkWell(
                         provider: provider,
                         startPage: StartPage.campusNetwork,

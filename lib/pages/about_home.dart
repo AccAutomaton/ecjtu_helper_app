@@ -108,7 +108,8 @@ class _AboutPageState extends State<AboutPage> {
                                     gravity: ToastGravity.CENTER);
                                 late bool hadUpdate;
                                 late String newVersion;
-                                (hadUpdate, newVersion) = await hasUpdate();
+                                late String updateMessage;
+                                (hadUpdate, newVersion, updateMessage) = await hasUpdate();
                                 if (hadUpdate) {
                                   setState(() {
                                     _checkUpdateTitle = Text(
@@ -124,10 +125,15 @@ class _AboutPageState extends State<AboutPage> {
                                           icon:
                                               const Icon(Icons.backup_outlined),
                                           title: Text("发现新版本: $newVersion"),
-                                          content: const Center(
+                                          content: Center(
                                               heightFactor: 0.5,
                                               widthFactor: 10,
-                                              child: Text("是否更新?")),
+                                              child: Row(
+                                                children: [
+                                                  Text(updateMessage),
+                                                  const Text("是否更新?"),
+                                                ],
+                                              )),
                                           actions: [
                                             TextButton(
                                               child: const Text('取消'),
@@ -139,7 +145,8 @@ class _AboutPageState extends State<AboutPage> {
                                               child: const Text('确认'),
                                               onPressed: () {
                                                 launchUrlString(
-                                                    "https://cdn.acautomaton.com/ecjtu_helper/ecjtu_helper-release-$newVersion.apk");
+                                                    // "https://cdn.acautomaton.com/ecjtu_helper/ecjtu_helper-release-$newVersion.apk");
+                                                    "https://github.com/AccAutomaton/ecjtu_helper_app/releases/download/$newVersion/ecjtu_helper-release-$newVersion.apk");
                                                 Navigator.of(context).pop();
                                               },
                                             ),
@@ -249,19 +256,21 @@ class _AboutPageState extends State<AboutPage> {
   }
 }
 
-Future<(bool, String)> hasUpdate() async {
+Future<(bool, String, String)> hasUpdate() async {
   Response response = await dio.get(
-      "https://toolbox.acautomaton.com/api/ecjtu_helper/v1alpha1/getUpdateInformation",
+      // "https://toolbox.acautomaton.com/api/ecjtu_helper/v1alpha1/getUpdateInformation",
+      "https://raw.githubusercontent.com/AccAutomaton/ecjtu_helper_app/main/updateInformation.json",
       options: Options(responseType: ResponseType.plain));
   if (response.statusCode == HttpStatus.ok) {
     var json = jsonDecode(response.data.toString());
     String? version = json["latest_version"];
+    String? updateMessage = json["update_message"];
     if (version == null) {
-      return (false, "");
+      return (false, "", "");
     }
     else if ((await PackageInfo.fromPlatform()).version != version) {
-      return (true, version);
+      return (true, version, updateMessage!);
     }
   }
-  return (false, "");
+  return (false, "", "");
 }

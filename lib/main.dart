@@ -4,7 +4,7 @@ import 'package:ecjtu_helper/utils/shared_preferences_util.dart';
 import 'package:flutter/material.dart';
 import 'package:ecjtu_helper/pages/about_home.dart';
 import 'package:ecjtu_helper/pages/campus_network.dart';
-import 'package:ecjtu_helper/pages/library_webview/library_webview_home.dart';
+// import 'package:ecjtu_helper/pages/library_webview/library_webview_home.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +27,7 @@ class MainNavBarPage extends StatefulWidget {
 }
 
 class _MainNavBarPageState extends State<MainNavBarPage> {
-  int _currentIndex = 2;
+  int _currentIndex = 1;
   bool _isAboutPageBadgeVisible = false;
 
   @override
@@ -42,7 +42,7 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
       }
     });
     readIntData("default_start_page").then((value) {
-      if (value != null) {
+      if (value != null && value < 2) {
         setState(() {
           _currentIndex = value;
         });
@@ -62,19 +62,19 @@ class _MainNavBarPageState extends State<MainNavBarPage> {
             body: LazyLoadIndexedStack(
               index: _currentIndex,
               children: const [
-                LibraryWebviewPage(),
+                // LibraryWebviewPage(),
                 CampusNetworkPage(),
                 AboutPage(),
               ],
             ),
             bottomNavigationBar: NavigationBar(
               destinations: [
-                const NavigationDestination(
-                  tooltip: "",
-                  icon: Icon(Icons.collections_bookmark_outlined),
-                  label: "图书馆",
-                  selectedIcon: Icon(Icons.collections_bookmark),
-                ),
+                // const NavigationDestination(
+                //   tooltip: "",
+                //   icon: Icon(Icons.collections_bookmark_outlined),
+                //   label: "图书馆",
+                //   selectedIcon: Icon(Icons.collections_bookmark),
+                // ),
                 const NavigationDestination(
                   tooltip: "",
                   icon: Icon(Icons.wifi),

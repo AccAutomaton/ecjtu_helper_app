@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../utils/shared_preferences_util.dart';
 
 enum StartPage {
-  library(name: "图书馆"), campusNetwork(name: "校园网"), about(name: "关于");
+  // library(name: "图书馆"), campusNetwork(name: "校园网"), about(name: "关于");
+  campusNetwork(name: "校园网"), about(name: "关于");
 
   final String name;
 
